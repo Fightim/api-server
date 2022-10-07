@@ -5,31 +5,31 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
-  @Prop()
+  @Prop({ required: true, type: String })
   email: string;
 
-  @Prop()
+  @Prop({ required: true, type: String })
   password: string;
 
-  @Prop()
+  @Prop({ required: false, type: String })
   accessKey: string;
 
-  @Prop()
+  @Prop({ required: false, type: String })
   secret: string;
 
-  @Prop()
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId }] })
   instances: [mongoose.Schema.Types.ObjectId];
 
-  @Prop()
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId }] })
   loadBalancers: [mongoose.Schema.Types.ObjectId];
 
-  @Prop()
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId }] })
   rds: [mongoose.Schema.Types.ObjectId];
 
-  @Prop()
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
-  @Prop()
+  @Prop({ type: [Date], default: [Date.now()] })
   loginAt: [Date];
 }
 
