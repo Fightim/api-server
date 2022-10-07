@@ -15,14 +15,10 @@ export class UserCreateDtoValidationPipe implements PipeTransform {
   }
 
   isSamePassword(password: string, passwordCheck: string): boolean {
-    console.log(password);
-    console.log(passwordCheck);
-    console.log(password === passwordCheck);
     return password === passwordCheck;
   }
 
   transform(value: CreateUserDto): CreateUserDto {
-    console.log(value);
     if (value.email && !this.isValidEmail(value.email)) {
       throw new BadRequestException('이메일 형식에 맞지 않습니다.');
     }
