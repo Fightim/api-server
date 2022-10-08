@@ -1,18 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-
-export enum InstanceType {
-  T2MICRO = 't2.micro',
-}
-
-export enum InstanceOS {
-  UBUNTU = 'UBUNTU',
-  CENTOS = 'CENTOS',
-}
-
-export enum InstanceTier {
-  WEBSERVER = 'WEBSERVER',
-  WAS = 'WAS',
-}
+import { InstanceOS, InstanceTier, InstanceType } from 'src/instances/dto';
 
 export class CreateInstanceDto {
   @ApiProperty({
