@@ -9,9 +9,12 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const isExists = await this.userModel.findOne({
-      email: createUserDto.email,
-    });
+    const isExists = await this.userModel
+      .findOne({
+        email: createUserDto.email,
+      })
+      .exec();
+
     if (isExists) {
       throw new BadRequestException('이미 사용중인 이메일입니다.');
     }
