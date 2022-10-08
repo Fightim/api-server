@@ -1,16 +1,26 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { CreateUserDto } from 'src/users/dto';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateUserDocs } from 'src/users/docs/swagger';
+import { CreateUserDto, UserResponseDto } from 'src/users/dto';
 import { UserCreateDtoValidationPipe } from 'src/users/pipes/user-create-validate.pipe';
+import { User } from 'src/users/users.schema';
 import { UsersService } from 'src/users/users.service';
 
+function getUserResponseDto(user: User): UserResponseDto {
+  return { email: user.email };
+}
+
+@ApiTags('User')
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post('')
+  @CreateUserDocs()
   async create(
     @Body(UserCreateDtoValidationPipe) createUserDto: CreateUserDto,
-  ) {
-    return this.usersService.create(createUserDto);
+  ): Promise<UserResponseDto> {
+    const user = await this.usersService.create(createUserDto);
+    return getUserResponseDto(user);
   }
 }
