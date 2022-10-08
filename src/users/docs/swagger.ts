@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-import { CreateUserDto, LoginUserDto } from 'src/users/dto';
+import { CreateUserDto, LoginUserDto, RegisterUserKeyDto } from 'src/users/dto';
 import { UserLoginResponseDto } from 'src/users/dto/user-login-response.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
@@ -28,6 +28,20 @@ export function LoginUserDocs() {
     }),
     ApiOkResponse({
       type: UserLoginResponseDto,
+    }),
+  );
+}
+
+export function RegisterUserKeyDocs() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'AWS Key 등록하기',
+    }),
+    ApiBody({
+      type: RegisterUserKeyDto,
+    }),
+    ApiOkResponse({
+      type: Boolean,
     }),
   );
 }
