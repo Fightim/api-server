@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateUserDocs } from 'src/users/docs/swagger';
+import { CreateUserDocs, LoginUserDocs } from 'src/users/docs/swagger';
 import { CreateUserDto, LoginUserDto, UserResponseDto } from 'src/users/dto';
 import { UserLoginResponseDto } from 'src/users/dto/user-login-response.dto';
 import { UserCreateDtoValidationPipe } from 'src/users/pipes/user-create-validate.pipe';
@@ -27,6 +27,7 @@ export class UsersController {
   }
 
   @Post('login')
+  @LoginUserDocs()
   async login(
     @Body(UserLoginDtoValidationPipe) loginUserDto: LoginUserDto,
   ): Promise<UserLoginResponseDto> {
