@@ -59,9 +59,9 @@ export class InstanceResponseDto {
   @ApiProperty({
     description: '인스턴스의 보안그룹',
     required: true,
-    type: String,
+    type: [String],
   })
-  securityGroup: string;
+  securityGroup: [string];
 
   @ApiProperty({
     description: '인스턴스의 스토리지 크기',
