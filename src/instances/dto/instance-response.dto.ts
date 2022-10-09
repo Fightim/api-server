@@ -8,6 +8,13 @@ import {
 
 export class InstanceResponseDto {
   @ApiProperty({
+    description: '인스턴스의 Id',
+    required: true,
+    type: String,
+  })
+  id: string;
+
+  @ApiProperty({
     description: '인스턴스 유형',
     required: true,
     enum: InstanceType,
