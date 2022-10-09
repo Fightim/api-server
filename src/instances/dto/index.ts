@@ -1,4 +1,5 @@
 import { CreateInstanceDto } from 'src/instances/dto/create-instance.dto';
+import { InstanceResponseDto } from 'src/instances/dto/instance-response.dto';
 
 export enum InstanceType {
   T2MICRO = 't2.micro',
@@ -19,4 +20,4 @@ export enum StorageType {
   HDD = 'HDD',
 }
 
-export { CreateInstanceDto };
+export { CreateInstanceDto, InstanceResponseDto };

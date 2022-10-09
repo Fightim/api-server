@@ -5,8 +5,7 @@ import {
   ApiOperation,
   ApiParam,
 } from '@nestjs/swagger';
-import { CreateInstanceDto } from 'src/instances/dto';
-import { InstanceResponseDto } from 'src/instances/dto/instance-response.dto';
+import { CreateInstanceDto, InstanceResponseDto } from 'src/instances/dto';
 
 export function CreateInstanceDocs() {
   return applyDecorators(
