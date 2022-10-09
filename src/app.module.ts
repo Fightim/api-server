@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { InstancesModule } from './instances/instances.module';
+import { LoadBalancersModule } from './load-balancers/load-balancers.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { InstancesModule } from './instances/instances.module';
     MongooseModule.forRootAsync(mongodbFactory),
     UsersModule,
     InstancesModule,
+    LoadBalancersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
