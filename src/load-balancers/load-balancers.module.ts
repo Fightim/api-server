@@ -4,6 +4,6 @@ import { LoadBalancersService } from './load-balancers.service';
 
 @Module({
   controllers: [LoadBalancersController],
-  providers: [LoadBalancersService]
+  providers: [LoadBalancersService],
 })
 export class LoadBalancersModule {}
