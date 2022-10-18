@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { InstancesModule } from './instances/instances.module';
 import { LoadBalancersModule } from './load-balancers/load-balancers.module';
+import { RdsModule } from './rds/rds.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { LoadBalancersModule } from './load-balancers/load-balancers.module';
     UsersModule,
     InstancesModule,
     LoadBalancersModule,
+    RdsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
