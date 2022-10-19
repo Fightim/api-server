@@ -1,8 +1,19 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateUserDocs } from 'src/users/docs/swagger';
-import { CreateUserDto, UserResponseDto } from 'src/users/dto';
+import {
+  CreateUserDocs,
+  LoginUserDocs,
+  RegisterUserKeyDocs,
+} from 'src/users/docs/swagger';
+import {
+  CreateUserDto,
+  LoginUserDto,
+  RegisterUserKeyDto,
+  UserResponseDto,
+  UserLoginResponseDto,
+} from 'src/users/dto';
 import { UserCreateDtoValidationPipe } from 'src/users/pipes/user-create-validate.pipe';
+import { UserLoginDtoValidationPipe } from 'src/users/pipes/user-login-validate.pipe';
 import { User } from 'src/users/users.schema';
 import { UsersService } from 'src/users/users.service';
 
@@ -22,5 +33,22 @@ export class UsersController {
   ): Promise<UserResponseDto> {
     const user = await this.usersService.create(createUserDto);
     return getUserResponseDto(user);
+  }
+
+  @Post('login')
+  @LoginUserDocs()
+  async login(
+    @Body(UserLoginDtoValidationPipe) loginUserDto: LoginUserDto,
+  ): Promise<UserLoginResponseDto> {
+    const mockToken: UserLoginResponseDto = { token: 'mock token' };
+    return mockToken;
+  }
+
+  @Post('key')
+  @RegisterUserKeyDocs()
+  async registerKey(
+    @Body() registerUserKeyDto: RegisterUserKeyDto,
+  ): Promise<boolean> {
+    return true;
   }
 }
