@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { InstanceOS, InstanceTier, InstanceType } from 'src/instances/dto';
+import {
+  InstanceOS,
+  InstanceTier,
+  InstanceType,
+} from 'src/instances/dto/instance-response.dto';
 
 export class CreateInstanceDto {
   @ApiProperty({
