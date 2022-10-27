@@ -6,12 +6,14 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { CreateInstanceDto, InstanceResponseDto } from 'src/instances/dto';
+import { JwtHeader } from 'src/utils/swagger';
 
 export function GetInstancesDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 정보 전부 가져오기',
     }),
+    JwtHeader,
     ApiOkResponse({
       type: [InstanceResponseDto],
     }),
@@ -21,8 +23,9 @@ export function GetInstancesDocs() {
 export function GetInstanceDocs() {
   return applyDecorators(
     ApiOperation({
-      summary: '인스턴스 정보 전부 가져오기',
+      summary: '인스턴스 정보 가져오기',
     }),
+    JwtHeader,
     ApiParam({
       name: 'instanceId',
       description: '가져올 instance Id',
@@ -40,6 +43,7 @@ export function CreateInstanceDocs() {
     ApiOperation({
       summary: '인스턴스 생성하기',
     }),
+    JwtHeader,
     ApiBody({
       type: CreateInstanceDto,
     }),
@@ -54,6 +58,7 @@ export function DeleteInstanceDocs() {
     ApiOperation({
       summary: '인스턴스 삭제하기',
     }),
+    JwtHeader,
     ApiParam({
       name: 'instanceId',
       description: '삭제할 인스턴스의 Id',

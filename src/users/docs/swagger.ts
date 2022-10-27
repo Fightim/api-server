@@ -3,6 +3,7 @@ import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { CreateUserDto, LoginUserDto, RegisterUserKeyDto } from 'src/users/dto';
 import { UserLoginResponseDto } from 'src/users/dto/user-login-response.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
+import { JwtHeader } from 'src/utils/swagger';
 
 export function CreateUserDocs() {
   return applyDecorators(
@@ -37,6 +38,7 @@ export function RegisterUserKeyDocs() {
     ApiOperation({
       summary: 'AWS Key 등록하기',
     }),
+    JwtHeader,
     ApiBody({
       type: RegisterUserKeyDto,
     }),
