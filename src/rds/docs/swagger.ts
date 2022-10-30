@@ -16,7 +16,7 @@ export function GetRdsesDocs() {
     }),
     JwtHeader,
     ApiOkResponse({
-      type: Array<RdsResponseDto>,
+      type: [RdsResponseDto],
     }),
   );
 }
