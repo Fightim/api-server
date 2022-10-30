@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class RdsResponseDto {
+export class RdsOptions {
   @ApiProperty({
     description: 'RDS 이름',
     required: true,
@@ -14,25 +14,43 @@ export class RdsResponseDto {
     type: String,
   })
   masterUserName: string;
+}
 
+export class RdsInformations {
   @ApiProperty({
-    name: '엔드포인트',
+    description: '엔드포인트',
     required: true,
     type: String,
   })
   endPoint: string;
 
   @ApiProperty({
-    name: '포트',
+    description: '포트',
     required: true,
     type: Number,
   })
   port: number;
 
   @ApiProperty({
-    name: '스토리지',
+    description: '스토리지',
     required: true,
     type: String,
   })
   storage: string;
+}
+
+export class RdsResponseDto {
+  @ApiProperty({
+    description: 'RDS 옵션',
+    required: true,
+    type: RdsOptions,
+  })
+  options: RdsOptions;
+
+  @ApiProperty({
+    description: 'RDS 정보',
+    required: true,
+    type: RdsInformations,
+  })
+  informations: RdsInformations;
 }
