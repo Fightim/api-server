@@ -19,7 +19,7 @@ export enum StorageType {
   HDD = 'HDD',
 }
 
-class InstanceOption {
+export class InstanceOption {
   @ApiProperty({
     description: '인스턴스 이름',
     required: true,
@@ -28,7 +28,7 @@ class InstanceOption {
   name: string;
 }
 
-class InstanceInformations {
+export class InstanceInformations {
   @ApiProperty({
     description: '인스턴스의 Id',
     required: true,
