@@ -19,7 +19,16 @@ export enum StorageType {
   HDD = 'HDD',
 }
 
-export class InstanceResponseDto {
+class InstanceOption {
+  @ApiProperty({
+    description: '인스턴스 이름',
+    required: true,
+    type: String,
+  })
+  name: string;
+}
+
+class InstanceInformations {
   @ApiProperty({
     description: '인스턴스의 Id',
     required: true,
@@ -47,13 +56,6 @@ export class InstanceResponseDto {
     enum: InstanceTier,
   })
   tier: InstanceTier;
-
-  @ApiProperty({
-    description: '인스턴스 이름',
-    required: true,
-    type: String,
-  })
-  name: string;
 
   @ApiProperty({
     description: '인스턴스의 퍼블릭 IP',
@@ -89,4 +91,20 @@ export class InstanceResponseDto {
     enum: StorageType,
   })
   storageType: StorageType;
+}
+
+export class InstanceResponseDto {
+  @ApiProperty({
+    description: '인스턴스 옵션',
+    required: true,
+    type: InstanceOption,
+  })
+  options: InstanceOption;
+
+  @ApiProperty({
+    description: '인스턴스 정보',
+    required: true,
+    type: InstanceInformations,
+  })
+  informations: InstanceInformations;
 }
