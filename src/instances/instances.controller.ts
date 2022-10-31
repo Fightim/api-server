@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   CreateInstanceDocs,
@@ -6,10 +6,13 @@ import {
   GetInstanceDocs,
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
+import { CreateInstanceDto } from 'src/instances/dto';
+import { InstancesService } from 'src/instances/instances.service';
 
 @ApiTags('Instance')
 @Controller('instances')
 export class InstancesController {
+  constructor(private readonly instancesService: InstancesService) {}
   @Get()
   @GetInstancesDocs()
   async getInstances() {
@@ -24,8 +27,8 @@ export class InstancesController {
 
   @Post()
   @CreateInstanceDocs()
-  async create() {
-    return 'POST /instances';
+  async create(@Body() createInstanceDto: CreateInstanceDto) {
+    return this.instancesService.create(createInstanceDto);
   }
 
   @Delete(':instanceId')
