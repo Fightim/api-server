@@ -5,6 +5,12 @@ import {
 } from '@nestjs/common';
 import { CreateInstanceDto } from 'src/instances/dto';
 import * as AWS from 'aws-sdk';
+import {
+  FRONTEND_USER_DATA_SCRIPT,
+  UBUNTU20_IMAGE_ID,
+} from 'src/constants/instance';
+import { SEOUL_REGION } from 'src/constants/common';
+import { updateAWSCredential } from 'src/aws/common';
 
 class mockUserModel {
   findOne(userId: string) {
@@ -25,58 +31,58 @@ export class InstancesService {
 
   async create(userId: string, createInstanceDto: CreateInstanceDto) {
     const user = this.userModel.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('잘못된 유저 정보입니다.');
+    }
 
-    if (!user.accessKey && !user.secret) {
+    if (!user.accessKey || !user.secret) {
       throw new NotFoundException(
         '유저의 access key id, secret key가 저장되어 있지 않습니다.',
       );
     }
 
-    const credential = new AWS.Credentials({
-      accessKeyId: user.accessKey ? user.accessKey : '',
-      secretAccessKey: user.secret ? user.secret : '',
-    });
+    updateAWSCredential(user.accessKey, user.secret);
 
-    AWS.config.update({
-      region: 'ap-northeast-2',
-      credentials: credential,
-    });
-
-    const UBUNTU2004 = 'ami-07d16c043aa8e5153';
-    // AMI is amzn-ami-2011.09.1.x86_64-ebs
     const instanceParams = {
-      ImageId: UBUNTU2004,
+      ImageId: UBUNTU20_IMAGE_ID,
       InstanceType: 't2.micro',
       KeyName: 'cause-api-server-dev',
       MinCount: 1,
       MaxCount: 1,
+      UserData: Buffer.from(FRONTEND_USER_DATA_SCRIPT).toString('base64'),
     };
 
     const newInstance = new AWS.EC2({ apiVersion: '2016-11-15' });
-    const instanceInfo = await newInstance
-      .runInstances(instanceParams)
-      .promise();
+    let instanceInfo;
+
+    try {
+      instanceInfo = await newInstance.runInstances(instanceParams).promise();
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException(
+        '인스턴스를 생성하는 도중에 문제가 발생했습니다',
+      );
+    }
 
     if (!instanceInfo.Instances) {
-      return new InternalServerErrorException(
+      throw new InternalServerErrorException(
         '제대로 인스턴스가 생성되지 않았습니다',
       );
     }
 
     if (!instanceInfo.Instances[0].InstanceId) {
-      return new InternalServerErrorException(
+      throw new InternalServerErrorException(
         '인스턴스 정보를 가져오지 못했습니다.',
       );
     }
 
     const instanceId = instanceInfo.Instances[0].InstanceId;
-
     const tagParams = {
       Resources: [instanceId],
       Tags: [
         {
           Key: 'Name',
-          Value: 'Javascript SDK Sample',
+          Value: createInstanceDto.name,
         },
       ],
     };
