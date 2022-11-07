@@ -9,10 +9,6 @@ import {
 import { CreateInstanceDto } from 'src/instances/dto';
 import { InstancesService } from 'src/instances/instances.service';
 
-class CustomRequest implements Express.Request {
-  user: string;
-}
-
 @ApiTags('Instance')
 @Controller('instances')
 export class InstancesController {
@@ -32,7 +28,7 @@ export class InstancesController {
   @Post()
   @CreateInstanceDocs()
   async create(
-    @Request() req: CustomRequest,
+    @Request() req: Express.Request & { user: string },
     @Body() createInstanceDto: CreateInstanceDto,
   ) {
     const user = req.user;
