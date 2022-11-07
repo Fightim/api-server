@@ -14,4 +14,5 @@ export const swaggerConfig = new DocumentBuilder()
   .setTitle('Cloud-GUI')
   .setDescription(description)
   .setVersion(appVersion)
+  .addBearerAuth()
   .build();
