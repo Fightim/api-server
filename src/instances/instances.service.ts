@@ -9,7 +9,6 @@ import {
   FRONTEND_USER_DATA_SCRIPT,
   UBUNTU20_IMAGE_ID,
 } from 'src/constants/instance';
-import { SEOUL_REGION } from 'src/constants/common';
 import { updateAWSCredential } from 'src/aws/common';
 import { createSecurityGroup } from 'src/aws/ec2';
 
