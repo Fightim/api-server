@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Request } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   CreateInstanceDocs,
@@ -6,10 +6,17 @@ import {
   GetInstanceDocs,
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
+import { CreateInstanceDto } from 'src/instances/dto';
+import { InstancesService } from 'src/instances/instances.service';
+
+class CustomRequest implements Express.Request {
+  user: string;
+}
 
 @ApiTags('Instance')
 @Controller('instances')
 export class InstancesController {
+  constructor(private readonly instancesService: InstancesService) {}
   @Get()
   @GetInstancesDocs()
   async getInstances() {
@@ -24,8 +31,13 @@ export class InstancesController {
 
   @Post()
   @CreateInstanceDocs()
-  async create() {
-    return 'POST /instances';
+  async create(
+    @Request() req: CustomRequest,
+    @Body() createInstanceDto: CreateInstanceDto,
+  ) {
+    const user = req.user;
+
+    return this.instancesService.create(user, createInstanceDto);
   }
 
   @Delete(':instanceId')
