@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { InstancesModule } from './instances/instances.module';
 import { LoadBalancersModule } from './load-balancers/load-balancers.module';
 import { RdsModule } from './rds/rds.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RdsModule } from './rds/rds.module';
     InstancesModule,
     LoadBalancersModule,
     RdsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
