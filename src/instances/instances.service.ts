@@ -45,7 +45,11 @@ export class InstancesService {
     updateAWSCredential(user.accessKey, user.secret);
 
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
-    const securityGroupId = await createSecurityGroup(ec2, 'test-name');
+    const now = new Date();
+    const securityGroupId = await createSecurityGroup(
+      ec2,
+      now.getTime() + '-webserver',
+    );
 
     const instanceParams: AWS.EC2.RunInstancesRequest = {
       ImageId: UBUNTU20_IMAGE_ID,
