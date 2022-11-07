@@ -11,6 +11,7 @@ import {
 } from 'src/constants/instance';
 import { SEOUL_REGION } from 'src/constants/common';
 import { updateAWSCredential } from 'src/aws/common';
+import { createSecurityGroup } from 'src/aws/ec2';
 
 class mockUserModel {
   findOne(userId: string) {
@@ -43,20 +44,23 @@ export class InstancesService {
 
     updateAWSCredential(user.accessKey, user.secret);
 
-    const instanceParams = {
+    const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
+    const securityGroupId = await createSecurityGroup(ec2, 'test-name');
+
+    const instanceParams: AWS.EC2.RunInstancesRequest = {
       ImageId: UBUNTU20_IMAGE_ID,
       InstanceType: 't2.micro',
       KeyName: 'cause-api-server-dev',
       MinCount: 1,
       MaxCount: 1,
       UserData: Buffer.from(FRONTEND_USER_DATA_SCRIPT).toString('base64'),
+      SecurityGroupIds: [securityGroupId],
     };
 
-    const newInstance = new AWS.EC2({ apiVersion: '2016-11-15' });
     let instanceInfo;
 
     try {
-      instanceInfo = await newInstance.runInstances(instanceParams).promise();
+      instanceInfo = await ec2.runInstances(instanceParams).promise();
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException(
@@ -87,7 +91,7 @@ export class InstancesService {
       ],
     };
 
-    const instanceName = await newInstance.createTags(tagParams).promise();
+    const instanceName = await ec2.createTags(tagParams).promise();
 
     console.log(instanceName);
     console.log(instanceInfo);
