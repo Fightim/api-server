@@ -4,6 +4,6 @@ import { InstancesService } from './instances.service';
 
 @Module({
   controllers: [InstancesController],
-  providers: [InstancesService]
+  providers: [InstancesService],
 })
 export class InstancesModule {}
