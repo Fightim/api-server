@@ -12,6 +12,7 @@ export function GetInstancesDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 정보 전부 가져오기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiOkResponse({
@@ -24,6 +25,7 @@ export function GetInstanceDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 정보 가져오기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiParam({
@@ -42,6 +44,7 @@ export function CreateInstanceDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 생성하기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiBody({
@@ -57,6 +60,7 @@ export function DeleteInstanceDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 삭제하기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiParam({
