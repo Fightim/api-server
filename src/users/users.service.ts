@@ -33,4 +33,17 @@ export class UsersService {
 
     return user;
   }
+
+  async updateKey(userId: string, accessKey: string, secret: string) {
+    const user = await this.userModel.findOne({ _id: userId });
+    if (!user) {
+      throw new BadRequestException('계정을 찾을 수 없습니다.');
+    }
+
+    user.accessKey = accessKey;
+    user.secret = secret;
+    user.save();
+
+    return true;
+  }
 }

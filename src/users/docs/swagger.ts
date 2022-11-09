@@ -1,5 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { CreateUserDto, RegisterUserKeyDto } from 'src/users/dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { JwtHeader } from 'src/utils/swagger';
@@ -22,8 +27,8 @@ export function RegisterUserKeyDocs() {
   return applyDecorators(
     ApiOperation({
       summary: 'AWS Key 등록하기',
-      deprecated: true,
     }),
+    ApiBearerAuth(),
     JwtHeader,
     ApiBody({
       type: RegisterUserKeyDto,
