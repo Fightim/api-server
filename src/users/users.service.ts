@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from 'src/users/dto';
-import { User, UserDocument } from 'src/users/users.schema';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 
 @Injectable()
 export class UsersService {
@@ -21,5 +21,16 @@ export class UsersService {
 
     const createdUser = this.userModel.create(createUserDto);
     return createdUser;
+  }
+
+  async findOne(email: string): Promise<User> {
+    const user = await this.userModel.findOne({ email: email });
+    if (!user) {
+      throw new BadRequestException(
+        '이메일에 해당하는 유저를 찾을 수 없습니다.',
+      );
+    }
+
+    return user;
   }
 }

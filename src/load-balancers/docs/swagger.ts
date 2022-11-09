@@ -15,6 +15,7 @@ export function GetLoadBalancersDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '로드밸런서 정보 전부 가져오기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiOkResponse({
@@ -27,6 +28,7 @@ export function GetLoadBalancerDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '특정 로드밸런서 정보 가져오기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiParam({
@@ -45,6 +47,7 @@ export function CreateLoadBalancerDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '로드밸런서 생성하기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiBody({
@@ -60,6 +63,7 @@ export function DeleteLoadBalancerDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '로드밸런서 삭제하기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiParam({

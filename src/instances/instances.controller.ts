@@ -1,5 +1,14 @@
-import { Body, Controller, Delete, Get, Post, Request } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import {
   CreateInstanceDocs,
   DeleteInstanceDocs,
@@ -10,6 +19,8 @@ import { CreateInstanceDto } from 'src/instances/dto';
 import { InstancesService } from 'src/instances/instances.service';
 
 @ApiTags('Instance')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('instances')
 export class InstancesController {
   constructor(private readonly instancesService: InstancesService) {}
