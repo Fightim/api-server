@@ -9,10 +9,15 @@ import { InstancesModule } from './instances/instances.module';
 import { LoadBalancersModule } from './load-balancers/load-balancers.module';
 import { RdsModule } from './rds/rds.module';
 import { AuthModule } from './auth/auth.module';
+import { envValidationSchema } from 'src/config/env.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    ConfigModule.forRoot({
+      validationSchema: envValidationSchema,
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
     MongooseModule.forRootAsync(mongodbFactory),
     UsersModule,
     InstancesModule,
