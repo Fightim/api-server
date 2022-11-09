@@ -22,6 +22,7 @@ export function RegisterUserKeyDocs() {
   return applyDecorators(
     ApiOperation({
       summary: 'AWS Key 등록하기',
+      deprecated: true,
     }),
     JwtHeader,
     ApiBody({
