@@ -32,6 +32,7 @@
     "@nestjs/swagger": "^6.1.2",
     "aws-sdk": "^2.1243.0",
     "crypto-js": "^4.1.1",
+    "joi": "^17.7.0",
     "mongoose": "^6.6.5",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
