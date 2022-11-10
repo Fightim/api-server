@@ -11,26 +11,19 @@ import {
 } from 'src/constants/instance';
 import { updateAWSCredential } from 'src/aws/common';
 import { createSecurityGroup } from 'src/aws/ec2';
-
-class mockUserModel {
-  findOne(userId: string) {
-    const accessKey = process.env.AWS_ACCESS_KEY;
-    const secret = process.env.AWS_SECRET;
-
-    return { id: 'mockUser', accessKey: accessKey, secret: secret };
-  }
-}
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/schemas/user.schema';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class InstancesService {
-  userModel: mockUserModel;
-
-  constructor() {
-    this.userModel = new mockUserModel();
-  }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async create(userId: string, createInstanceDto: CreateInstanceDto) {
-    const user = this.userModel.findOne(userId);
+    const user = await this.usersService.findOneWithId(userId);
     if (!user) {
       throw new NotFoundException('잘못된 유저 정보입니다.');
     }
@@ -41,7 +34,12 @@ export class InstancesService {
       );
     }
 
-    updateAWSCredential(user.accessKey, user.secret);
+    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
+      user.accessKey,
+      user.secret,
+    );
+
+    updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
     const now = new Date();
