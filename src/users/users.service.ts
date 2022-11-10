@@ -44,6 +44,17 @@ export class UsersService {
     return user;
   }
 
+  async findOneWithId(id: string): Promise<User> {
+    const user = await this.userModel.findOne({ _id: id });
+    if (!user) {
+      throw new BadRequestException(
+        '아이디에 해당하는 유저를 찾을 수 없습니다.',
+      );
+    }
+
+    return user;
+  }
+
   async updateKey(userId: string, accessKey: string, secret: string) {
     if (!this.configService.get<string>('AES_SECRET')) throw Error();
     const user = await this.userModel.findOne({ _id: userId });
