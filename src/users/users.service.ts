@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from 'src/users/dto';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
+import * as CryptoJs from 'crypto-js';
 
 @Injectable()
 export class UsersService {
@@ -50,8 +51,7 @@ export class UsersService {
       throw new BadRequestException('계정을 찾을 수 없습니다.');
     }
 
-    const { encodedAccessKey, encodedSecret } = await User.encodeKeys(
-      this.aesSecret,
+    const { encodedAccessKey, encodedSecret } = await this.encodeKeys(
       accessKey,
       secret,
     );
@@ -61,5 +61,32 @@ export class UsersService {
     user.save();
 
     return true;
+  }
+
+  async encodeKeys(accessKey: string, secret: string) {
+    const encodedAccessKey = CryptoJs.AES.encrypt(
+      accessKey,
+      this.aesSecret,
+    ).toString();
+    const encodedSecretKey = CryptoJs.AES.encrypt(
+      secret,
+      this.aesSecret,
+    ).toString();
+    return {
+      encodedAccessKey: encodedAccessKey,
+      encodedSecret: encodedSecretKey,
+    };
+  }
+
+  decodeKeys(encodedAccessKey: string, encodedSecret: string) {
+    const decodedAccessKey = CryptoJs.AES.decrypt(
+      encodedAccessKey,
+      this.aesSecret,
+    ).toString(CryptoJs.enc.Utf8);
+    const decodedSecret = CryptoJs.AES.decrypt(
+      encodedSecret,
+      this.aesSecret,
+    ).toString(CryptoJs.enc.Utf8);
+    return { decodedAccessKey: decodedAccessKey, decodedSecret: decodedSecret };
   }
 }

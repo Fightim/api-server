@@ -17,6 +17,8 @@ import {
 } from 'src/instances/docs/swagger';
 import { CreateInstanceDto } from 'src/instances/dto';
 import { InstancesService } from 'src/instances/instances.service';
+import { getUserId } from 'src/users/utils';
+import { AuthorizedRequest } from 'src/utils/types';
 
 @ApiTags('Instance')
 @UseGuards(JwtAuthGuard)
@@ -39,12 +41,11 @@ export class InstancesController {
   @Post()
   @CreateInstanceDocs()
   async create(
-    @Request() req: Express.Request & { user: string },
+    @Request() req: AuthorizedRequest,
     @Body() createInstanceDto: CreateInstanceDto,
   ) {
-    const user = req.user;
-
-    return this.instancesService.create(user, createInstanceDto);
+    const userId = getUserId(req);
+    return this.instancesService.create(userId, createInstanceDto);
   }
 
   @Delete(':instanceId')
