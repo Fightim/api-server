@@ -15,13 +15,9 @@ import {
   UserResponseDto,
 } from 'src/users/dto';
 import { UserCreateDtoValidationPipe } from 'src/users/pipes/user-create-validate.pipe';
-import { User } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
+import { getUserId, getUserResponseDto } from 'src/users/utils';
 import { AuthorizedRequest } from 'src/utils/types';
-
-function getUserResponseDto(user: User): UserResponseDto {
-  return { email: user.email };
-}
 
 @ApiTags('User')
 @Controller('users')
@@ -44,7 +40,8 @@ export class UsersController {
     @Request() req: AuthorizedRequest,
     @Body() registerUserKeyDto: RegisterUserKeyDto,
   ): Promise<boolean> {
-    const { userId } = req.user;
+    const userId = getUserId(req);
+
     if (!userId) {
       throw new UnauthorizedException();
     }
