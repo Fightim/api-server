@@ -6,6 +6,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { CreateInstanceDto, InstanceResponseDto } from 'src/instances/dto';
+import { InstanceConnectionConfigResponseDto } from 'src/instances/dto/instance-connection-config-response.dto';
 import { JwtHeader } from 'src/utils/swagger';
 
 export function GetInstancesDocs() {
@@ -70,6 +71,19 @@ export function DeleteInstanceDocs() {
     }),
     ApiOkResponse({
       type: Boolean,
+    }),
+  );
+}
+
+export function GetInstancesBackendDocs() {
+  return applyDecorators(
+    ApiOperation({
+      summary: '백엔드 인스턴스 정보 가져오기',
+      deprecated: true,
+    }),
+    JwtHeader,
+    ApiOkResponse({
+      type: InstanceConnectionConfigResponseDto,
     }),
   );
 }
