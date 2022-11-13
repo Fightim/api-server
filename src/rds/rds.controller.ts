@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import {
   CreateRdsDocs,
   DeleteRdsDocs,
+  GetRdsConfig,
   GetRdsDocs,
   GetRdsesDocs,
 } from 'src/rds/docs/swagger';
@@ -32,5 +33,11 @@ export class RdsController {
   @DeleteRdsDocs()
   async deleteRds() {
     return 'DELETE /rdses/:rdsId';
+  }
+
+  @Get('config')
+  @GetRdsConfig()
+  async getRdsConfig() {
+    return 'GET /rds/config';
   }
 }
