@@ -7,6 +7,7 @@ import {
 } from '@nestjs/swagger';
 
 import { CreateRdsDto, RdsResponseDto } from 'src/rds/dto';
+import { RdsConnectionConfigResponseDto } from 'src/rds/dto/rds-connection-config-response.dto';
 import { JwtHeader } from 'src/utils/swagger';
 
 export function GetRdsesDocs() {
@@ -72,6 +73,19 @@ export function DeleteRdsDocs() {
     }),
     ApiOkResponse({
       type: Boolean,
+    }),
+  );
+}
+
+export function GetRdsConfig() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'RDS 접속 정보 가져오기',
+      deprecated: true,
+    }),
+    JwtHeader,
+    ApiOkResponse({
+      type: RdsConnectionConfigResponseDto,
     }),
   );
 }

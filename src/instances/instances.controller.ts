@@ -13,6 +13,7 @@ import {
   CreateInstanceDocs,
   DeleteInstanceDocs,
   GetInstanceDocs,
+  GetInstancesBackendDocs,
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
 import { CreateInstanceDto } from 'src/instances/dto';
@@ -51,5 +52,11 @@ export class InstancesController {
   @DeleteInstanceDocs()
   async delete() {
     return 'DELETE /instances/:instanceId';
+  }
+
+  @Get('backend')
+  @GetInstancesBackendDocs()
+  async getBackendInstance() {
+    return 'GET /instances/backend';
   }
 }
