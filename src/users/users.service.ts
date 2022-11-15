@@ -1,10 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { CreateUserDto } from 'src/users/dto';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import * as CryptoJs from 'crypto-js';
+
+export type ReturnedUser = Document<unknown, any, UserDocument> &
+  User &
+  Document;
 
 @Injectable()
 export class UsersService {
@@ -18,7 +22,7 @@ export class UsersService {
     this.aesSecret = secret;
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<ReturnedUser> {
     const isExists = await this.userModel
       .findOne({
         email: createUserDto.email,
@@ -33,8 +37,8 @@ export class UsersService {
     return createdUser;
   }
 
-  async findOne(email: string): Promise<User> {
-    const user = await this.userModel.findOne({ email: email });
+  async findOne(email: string): Promise<ReturnedUser> {
+    const user = await this.userModel.findOne({ email: email }).exec();
     if (!user) {
       throw new BadRequestException(
         '이메일에 해당하는 유저를 찾을 수 없습니다.',
@@ -44,8 +48,8 @@ export class UsersService {
     return user;
   }
 
-  async findOneWithId(id: string): Promise<User> {
-    const user = await this.userModel.findOne({ _id: id });
+  async findOneWithId(id: string): Promise<ReturnedUser> {
+    const user = await this.userModel.findOne({ _id: id }).exec();
     if (!user) {
       throw new BadRequestException(
         '아이디에 해당하는 유저를 찾을 수 없습니다.',
@@ -57,7 +61,7 @@ export class UsersService {
 
   async updateKey(userId: string, accessKey: string, secret: string) {
     if (!this.configService.get<string>('AES_SECRET')) throw Error();
-    const user = await this.userModel.findOne({ _id: userId });
+    const user = await this.userModel.findOne({ _id: userId }).exec();
     if (!user) {
       throw new BadRequestException('계정을 찾을 수 없습니다.');
     }
