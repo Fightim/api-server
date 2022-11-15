@@ -12,17 +12,25 @@ import {
 import { updateAWSCredential } from 'src/aws/common';
 import { createSecurityGroup } from 'src/aws/ec2';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/schemas/user.schema';
-import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import {
+  Instance,
+  InstanceDocument,
+} from 'src/instances/schemas/instance.schema';
+import { Model } from 'mongoose';
+import { PromiseResult } from 'aws-sdk/lib/request';
 
 @Injectable()
 export class InstancesService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly configService: ConfigService,
+    @InjectModel(Instance.name) private instanceModel: Model<InstanceDocument>,
   ) {}
 
-  async create(userId: string, createInstanceDto: CreateInstanceDto) {
+  async create(
+    userId: string,
+    createInstanceDto: CreateInstanceDto,
+  ): Promise<PromiseResult<AWS.EC2.Reservation, AWS.AWSError>> {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) {
       throw new NotFoundException('잘못된 유저 정보입니다.');
@@ -58,7 +66,7 @@ export class InstancesService {
       SecurityGroupIds: [securityGroupId],
     };
 
-    let instanceInfo;
+    let instanceInfo: PromiseResult<AWS.EC2.Reservation, AWS.AWSError>;
 
     try {
       instanceInfo = await ec2.runInstances(instanceParams).promise();
@@ -97,5 +105,7 @@ export class InstancesService {
     console.log(instanceName);
     console.log(instanceInfo);
     console.log(createInstanceDto);
+
+    return instanceInfo;
   }
 }

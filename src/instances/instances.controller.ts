@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Post,
   Request,
   UseGuards,
@@ -16,6 +17,12 @@ import {
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
 import { CreateInstanceDto } from 'src/instances/dto';
+import {
+  InstanceInformations,
+  InstanceOption,
+  InstanceResponseDto,
+  StorageType,
+} from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
 import { getUserId } from 'src/users/utils';
 import { AuthorizedRequest } from 'src/utils/types';
@@ -45,7 +52,43 @@ export class InstancesController {
     @Body() createInstanceDto: CreateInstanceDto,
   ) {
     const userId = getUserId(req);
-    return this.instancesService.create(userId, createInstanceDto);
+    const instanceInfo = await this.instancesService.create(
+      userId,
+      createInstanceDto,
+    );
+
+    if (!instanceInfo.Instances || !instanceInfo.Instances[0].InstanceId) {
+      throw new InternalServerErrorException(
+        '인스턴스 생성 후 정보를 가져오는데 에러가 발생했습니다.',
+      );
+    }
+
+    const instanceOption: InstanceOption = {
+      name: createInstanceDto.name,
+    };
+
+    const instanceInformations: InstanceInformations = {
+      id: instanceInfo.Instances[0].InstanceId,
+      type: createInstanceDto.type,
+      os: createInstanceDto.os,
+      tier: createInstanceDto.tier,
+      publicIp: instanceInfo.Instances[0].PublicIpAddress || null,
+      privateIp: instanceInfo.Instances[0].PrivateIpAddress || null,
+      securityGroup: [
+        'tcp : 80 - 0.0.0.0/0',
+        'tcp : 22 - 0.0.0.0/0',
+        'tcp : 443 - 0.0.0.0/0',
+      ],
+      storageType: StorageType.SSD,
+      storageVolume: '8GB',
+    };
+
+    const response: InstanceResponseDto = {
+      options: instanceOption,
+      informations: instanceInformations,
+    };
+
+    return response;
   }
 
   @Delete(':instanceId')
