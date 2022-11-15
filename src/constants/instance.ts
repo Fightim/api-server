@@ -19,6 +19,6 @@ sudo apt update
 sudo apt -y install docker-ce docker-ce-cli containerd.io
 sudo systemctl enable docker.service
 
-sudo docker pull deokam/react-nginx:1.1
-sudo docker run -d -p 80:80 --name react-test deokam/react-nginx:1.1
+sudo docker pull deokam/result-page:1.0
+sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0
  `;
