@@ -63,7 +63,7 @@ export class InstanceInformations {
     type: String,
     nullable: true,
   })
-  publicIp: string | undefined;
+  publicIp: string | null;
 
   @ApiProperty({
     description: '인스턴스의 프라이빗 IP',
@@ -71,7 +71,7 @@ export class InstanceInformations {
     type: String,
     nullable: true,
   })
-  privateIp: string | undefined;
+  privateIp: string | null;
 
   @ApiProperty({
     description: '인스턴스의 보안그룹',
