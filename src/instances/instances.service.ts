@@ -11,7 +11,7 @@ import {
 } from 'src/constants/instance';
 import { updateAWSCredential } from 'src/aws/common';
 import { createSecurityGroup } from 'src/aws/ec2';
-import { UsersService } from 'src/users/users.service';
+import { ReturnedUser, UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   Instance,
@@ -19,6 +19,10 @@ import {
 } from 'src/instances/schemas/instance.schema';
 import { Model } from 'mongoose';
 import { PromiseResult } from 'aws-sdk/lib/request';
+import {
+  InstanceTier,
+  StorageType,
+} from 'src/instances/dto/instance-response.dto';
 
 @Injectable()
 export class InstancesService {
@@ -110,8 +114,38 @@ export class InstancesService {
       console.log(instanceInfo);
       console.log(createInstanceDto);
       instanceInfos.push(instanceInfo);
+
+      this.saveInstance(user, createInstanceDto, instanceInfo.Instances[0]);
     }
 
     return instanceInfos;
+  }
+
+  async saveInstance(
+    user: ReturnedUser,
+    createInstanceDto: CreateInstanceDto,
+    instanceInfo: AWS.EC2.Instance,
+  ) {
+    const createdInstance = await this.instanceModel.create({
+      instanceId: instanceInfo.InstanceId,
+      name: createInstanceDto.name,
+      publicIp: instanceInfo.PublicIpAddress || null,
+      privateIp: instanceInfo.PrivateIpAddress,
+      securityGroup: ['tcp : 80 - 0.0.0.0/0', 'tcp : 22 - 0.0.0.0/0'],
+      type: createInstanceDto.type,
+      os: createInstanceDto.os,
+      tier: createInstanceDto.tier,
+      storageType: StorageType.SSD,
+      storageVolume: '8GB',
+      etc: instanceInfo,
+    });
+
+    if (createdInstance.tier == InstanceTier.WEBSERVER) {
+      user.frontendInstances.push(createdInstance._id);
+    } else if (createdInstance.tier == InstanceTier.WAS) {
+      user.backendInstances.push(createdInstance._id);
+    }
+
+    user.save();
   }
 }
