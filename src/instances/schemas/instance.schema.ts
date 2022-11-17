@@ -1,5 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import {
+  InstanceOS,
+  InstanceTier,
+  InstanceType,
+} from 'src/instances/dto/instance-response.dto';
 
 export type InstanceDocument = Instance & Document;
 
@@ -11,13 +16,18 @@ export class Instance {
     required: true,
     type: String,
   })
-  name: string;
+  instanceId: string;
 
   @Prop({
     required: true,
     type: String,
   })
-  publicIp: string;
+  name: string;
+
+  @Prop({
+    type: String,
+  })
+  publicIp: string | null;
 
   @Prop({
     required: true,
@@ -29,19 +39,28 @@ export class Instance {
     required: true,
     type: Array<string>,
   })
-  securityGroup: string;
+  securityGroup: Array<string>;
 
   @Prop({
     required: true,
     type: String,
+    enum: InstanceType,
   })
-  type: string;
+  type: InstanceType;
 
   @Prop({
     required: true,
     type: String,
+    enum: InstanceOS,
   })
-  os: string;
+  os: InstanceOS;
+
+  @Prop({
+    required: true,
+    type: String,
+    enum: InstanceTier,
+  })
+  tier: InstanceTier;
 
   @Prop({
     required: true,
@@ -54,6 +73,18 @@ export class Instance {
     type: String,
   })
   storageType: string;
+
+  @Prop({
+    required: true,
+    type: Date,
+    default: Date.now,
+  })
+  createdAt: Date;
+
+  @Prop({
+    type: mongoose.Schema.Types.Mixed,
+  })
+  etc: any;
 }
 
 export const InstanceSchema = SchemaFactory.createForClass(Instance);

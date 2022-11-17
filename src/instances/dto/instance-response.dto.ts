@@ -61,22 +61,24 @@ export class InstanceInformations {
     description: '인스턴스의 퍼블릭 IP',
     required: true,
     type: String,
+    nullable: true,
   })
-  publicIp: string;
+  publicIp: string | null;
 
   @ApiProperty({
     description: '인스턴스의 프라이빗 IP',
     required: true,
     type: String,
+    nullable: true,
   })
-  privateIp: string;
+  privateIp: string | null;
 
   @ApiProperty({
     description: '인스턴스의 보안그룹',
     required: true,
     type: [String],
   })
-  securityGroup: [string];
+  securityGroup: string[];
 
   @ApiProperty({
     description: '인스턴스의 스토리지 크기',
