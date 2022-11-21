@@ -31,6 +31,49 @@ export class InstancesService {
     @InjectModel(Instance.name) private instanceModel: Model<InstanceDocument>,
   ) {}
 
+  async getInstances(userId: string) {
+    const user = await this.usersService.findOneWithId(userId);
+
+    if (!user) {
+      throw new NotFoundException('잘못된 유저 정보입니다.');
+    }
+
+    if (!user.accessKey || !user.secret) {
+      throw new NotFoundException(
+        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
+      );
+    }
+
+    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
+      user.accessKey,
+      user.secret,
+    );
+
+    updateAWSCredential(decodedAccessKey, decodedSecret);
+
+    const instances: string[] = [];
+
+    for (const id of user.frontendInstances) {
+      const instance = await this.instanceModel.findOne({ _id: id }).exec();
+      if (!instance) {
+        throw new InternalServerErrorException('Error가 발생했습니다.');
+      }
+      instances.push(instance.instanceId);
+    }
+
+    console.log(instances);
+
+    const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
+    const params: AWS.EC2.DescribeInstancesRequest = {
+      InstanceIds: instances,
+    };
+
+    const info = await ec2.describeInstances(params, function (error, data) {
+      console.log(data);
+    });
+    return 'GET /instances';
+  }
+
   async create(
     userId: string,
     createInstanceDtos: CreateInstanceDto[],

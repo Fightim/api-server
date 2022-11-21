@@ -35,8 +35,10 @@ export class InstancesController {
   constructor(private readonly instancesService: InstancesService) {}
   @Get()
   @GetInstancesDocs()
-  async getInstances() {
-    return 'GET /instances';
+  async getInstances(@Request() req: AuthorizedRequest) {
+    const userId = getUserId(req);
+    const response = this.instancesService.getInstances(userId);
+    return response;
   }
 
   @Get(':instanceId')
