@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -55,6 +56,13 @@ export class InstancesController {
   ): Promise<InstanceResponseDto[]> {
     const responses: InstanceResponseDto[] = [];
     const userId = getUserId(req);
+
+    if (!Array.isArray(createInstanceDtos)) {
+      throw new BadRequestException(
+        'createInstanceDto가 배열 형태가 아닙니다.', // #11.22 TODO : createInstanceDtos Guard로 Type Check 하기
+      );
+    }
+
     const instanceInfos = await this.instancesService.create(
       userId,
       createInstanceDtos,
