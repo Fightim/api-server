@@ -48,7 +48,7 @@ export function CreateInstanceDocs() {
     }),
     JwtHeader,
     ApiBody({
-      type: CreateInstanceDto,
+      type: [CreateInstanceDto],
     }),
     ApiOkResponse({
       type: InstanceResponseDto,
