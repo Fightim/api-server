@@ -13,7 +13,6 @@ export function GetInstancesDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 정보 전부 가져오기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiOkResponse({
@@ -45,7 +44,6 @@ export function CreateInstanceDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 생성하기',
-      deprecated: true,
       description: `여러 인스턴스를 한번에 생성할 수 있습니다.   
         CreateInstanceDto의 배열을 전달해 여러 인스턴스를 생성할 수 있습니다.   
         하나의 인스턴스를 생성할 때에도 body의 배열의 형태로 전달해야합니다.`,
