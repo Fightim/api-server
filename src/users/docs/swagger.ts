@@ -5,8 +5,8 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
+import { LoginResponseDto } from 'src/auth/dto';
 import { CreateUserDto, RegisterUserKeyDto } from 'src/users/dto';
-import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { JwtHeader } from 'src/utils/swagger';
 
 export function CreateUserDocs() {
@@ -18,7 +18,7 @@ export function CreateUserDocs() {
       type: CreateUserDto,
     }),
     ApiOkResponse({
-      type: UserResponseDto,
+      type: LoginResponseDto,
     }),
   );
 }
