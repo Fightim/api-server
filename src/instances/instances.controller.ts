@@ -5,6 +5,8 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  NotFoundException,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -26,7 +28,10 @@ import {
   StorageType,
 } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
-import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
+import {
+  getInstanceResponseDtoFromInstance,
+  getInstanceResponseDtoFromInstances,
+} from 'src/instances/utils/getInstances';
 import { getUserId } from 'src/users/utils';
 import { AuthorizedRequest } from 'src/utils/types';
 
@@ -56,8 +61,23 @@ export class InstancesController {
 
   @Get(':instanceId')
   @GetInstanceDocs()
-  async getInstance() {
-    return 'GET /instances/:instanceId';
+  async getInstance(
+    @Request() req: AuthorizedRequest,
+    @Param('instanceId') instanceId: string,
+  ) {
+    const userId = getUserId(req);
+
+    const instance = await this.instancesService.getInstance(
+      userId,
+      instanceId,
+    );
+
+    if (!instance) {
+      throw new NotFoundException('인스턴스 정보를 찾을 수 없습니다.');
+    }
+
+    const { savedInstance, fetchedInstance } = instance;
+    return getInstanceResponseDtoFromInstance(savedInstance, fetchedInstance);
   }
 
   @Post()

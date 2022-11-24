@@ -112,6 +112,43 @@ export class InstancesService {
     // 1124 TODO DB에 정보 refresh 하기
   }
 
+  async getInstance(userId: string, instanceId: string) {
+    const user = await this.usersService.findOneWithId(userId);
+
+    if (!user) {
+      throw new NotFoundException('잘못된 유저 정보입니다.');
+    }
+
+    if (!user.accessKey || !user.secret) {
+      throw new NotFoundException(
+        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
+      );
+    }
+
+    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
+      user.accessKey,
+      user.secret,
+    );
+
+    updateAWSCredential(decodedAccessKey, decodedSecret);
+
+    const savedInstance = await this.instanceModel
+      .findOne({ instanceId: instanceId })
+      .exec();
+    if (!savedInstance) {
+      throw new NotFoundException('해당 인스턴스를 찾을 수 없습니다.');
+    }
+
+    const fetchedInstances = await this.fetchInstances([
+      savedInstance.instanceId,
+    ]);
+    if (!fetchedInstances) {
+      return null;
+    }
+    const fetchedInstance = fetchedInstances[0][0];
+    return { savedInstance, fetchedInstance };
+  }
+
   async create(
     userId: string,
     createInstanceDtos: CreateInstanceDto[],
