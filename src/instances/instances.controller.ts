@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -25,6 +26,7 @@ import {
   StorageType,
 } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
+import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
 import { getUserId } from 'src/users/utils';
 import { AuthorizedRequest } from 'src/utils/types';
 
@@ -36,8 +38,20 @@ export class InstancesController {
   constructor(private readonly instancesService: InstancesService) {}
   @Get()
   @GetInstancesDocs()
-  async getInstances() {
-    return 'GET /instances';
+  async getInstances(@Request() req: AuthorizedRequest) {
+    const userId = getUserId(req);
+
+    const res = await this.instancesService.getInstances(userId);
+    if (!res) {
+      return [];
+    }
+
+    const { savedInstances, fetchedInstances } = res;
+
+    return getInstanceResponseDtoFromInstances(
+      savedInstances,
+      fetchedInstances,
+    );
   }
 
   @Get(':instanceId')
@@ -54,6 +68,13 @@ export class InstancesController {
   ): Promise<InstanceResponseDto[]> {
     const responses: InstanceResponseDto[] = [];
     const userId = getUserId(req);
+
+    if (!Array.isArray(createInstanceDtos)) {
+      throw new BadRequestException(
+        'createInstanceDto가 배열 형태가 아닙니다.', // #11.22 TODO : createInstanceDtos Guard로 Type Check 하기
+      );
+    }
+
     const instanceInfos = await this.instancesService.create(
       userId,
       createInstanceDtos,
