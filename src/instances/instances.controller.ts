@@ -25,6 +25,7 @@ import {
   StorageType,
 } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
+import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
 import { getUserId } from 'src/users/utils';
 import { AuthorizedRequest } from 'src/utils/types';
 
@@ -38,8 +39,18 @@ export class InstancesController {
   @GetInstancesDocs()
   async getInstances(@Request() req: AuthorizedRequest) {
     const userId = getUserId(req);
-    const response = this.instancesService.getInstances(userId);
-    return response;
+
+    const res = await this.instancesService.getInstances(userId);
+    if (!res) {
+      return [];
+    }
+
+    const { savedInstances, fetchedInstances } = res;
+
+    return getInstanceResponseDtoFromInstances(
+      savedInstances,
+      fetchedInstances,
+    );
   }
 
   @Get(':instanceId')

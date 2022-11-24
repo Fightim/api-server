@@ -17,19 +17,49 @@ import {
   Instance,
   InstanceDocument,
 } from 'src/instances/schemas/instance.schema';
-import { Model } from 'mongoose';
+import { Model, Schema } from 'mongoose';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import {
   InstanceTier,
   StorageType,
 } from 'src/instances/dto/instance-response.dto';
-
+export type InstanceModel = Instance &
+  Document &
+  Required<{
+    _id: Schema.Types.ObjectId;
+  }>;
 @Injectable()
 export class InstancesService {
   constructor(
     private readonly usersService: UsersService,
     @InjectModel(Instance.name) private instanceModel: Model<InstanceDocument>,
   ) {}
+
+  async fetchInstances(
+    instanceIds: string[],
+  ): Promise<AWS.EC2.InstanceList[] | null> {
+    const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
+    const params: AWS.EC2.DescribeInstancesRequest = {
+      InstanceIds: instanceIds,
+    };
+
+    const info = await ec2.describeInstances(params).promise();
+
+    if (!info.Reservations) {
+      return null;
+    }
+
+    const instances: AWS.EC2.InstanceList[] = [];
+
+    for (const reservations of info.Reservations) {
+      if (reservations.Instances) {
+        const instance = reservations.Instances;
+        instances.push(instance);
+      }
+    }
+
+    return instances;
+  }
 
   async getInstances(userId: string) {
     const user = await this.usersService.findOneWithId(userId);
@@ -51,27 +81,35 @@ export class InstancesService {
 
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
-    const instances: string[] = [];
+    const savedInstances: InstanceModel[] = [];
 
     for (const id of user.frontendInstances) {
       const instance = await this.instanceModel.findOne({ _id: id }).exec();
       if (!instance) {
         throw new InternalServerErrorException('Error가 발생했습니다.');
       }
-      instances.push(instance.instanceId);
+      savedInstances.push(instance);
     }
 
-    console.log(instances);
+    for (const id of user.backendInstances) {
+      const instance = await this.instanceModel.findOne({ _id: id }).exec();
+      if (!instance) {
+        throw new InternalServerErrorException('Error가 발생했습니다.');
+      }
+      savedInstances.push(instance);
+    }
 
-    const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
-    const params: AWS.EC2.DescribeInstancesRequest = {
-      InstanceIds: instances,
-    };
-
-    const info = await ec2.describeInstances(params, function (error, data) {
-      console.log(data);
+    const instanceIds = savedInstances.map((instance: InstanceModel) => {
+      return instance.instanceId;
     });
-    return 'GET /instances';
+
+    const fetchedInstances = await this.fetchInstances(instanceIds);
+    if (!fetchedInstances) {
+      return null;
+    }
+    return { savedInstances, fetchedInstances };
+
+    // 1124 TODO DB에 정보 refresh 하기
   }
 
   async create(
