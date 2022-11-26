@@ -27,10 +27,7 @@ import {
   InstanceResponseDto,
 } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
-import {
-  getInstanceResponseDtoFromInstance,
-  getInstanceResponseDtoFromInstances,
-} from 'src/instances/utils/getInstances';
+import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
 import { getUserId } from 'src/users/utils';
 import { AuthorizedRequest } from 'src/utils/types';
 
@@ -76,7 +73,7 @@ export class InstancesController {
     }
 
     const { savedInstance, fetchedInstance } = instance;
-    return getInstanceResponseDtoFromInstance(savedInstance, fetchedInstance);
+    return new InstanceResponseDto(savedInstance, fetchedInstance);
   }
 
   @Post()
