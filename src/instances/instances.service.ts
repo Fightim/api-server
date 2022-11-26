@@ -194,13 +194,8 @@ export class InstancesService {
         ],
       };
 
-      const instanceName = await ec2.createTags(tagParams).promise();
-
-      console.log(instanceName);
-      console.log(instanceInfo);
-      console.log(createInstanceDto);
+      await ec2.createTags(tagParams).promise();
       instanceInfos.push(instanceInfo);
-
       this.saveInstance(user, createInstanceDto, instanceInfo.Instances[0]);
     }
 
