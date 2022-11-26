@@ -19,10 +19,7 @@ import {
 } from 'src/instances/schemas/instance.schema';
 import { Model, Schema } from 'mongoose';
 import { PromiseResult } from 'aws-sdk/lib/request';
-import {
-  InstanceTier,
-  StorageType,
-} from 'src/instances/dto/instance-response.dto';
+import { InstanceTier } from 'src/instances/dto/instance-response.dto';
 export type InstanceModel = Instance &
   Document &
   Required<{
@@ -224,8 +221,6 @@ export class InstancesService {
       type: createInstanceDto.type,
       os: createInstanceDto.os,
       tier: createInstanceDto.tier,
-      storageType: StorageType.SSD,
-      storageVolume: '8GB',
       etc: instanceInfo,
     });
 

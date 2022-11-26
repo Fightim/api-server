@@ -14,11 +14,6 @@ export enum InstanceTier {
   WAS = 'WAS',
 }
 
-export enum StorageType {
-  SSD = 'SSD',
-  HDD = 'HDD',
-}
-
 export class InstanceOption {
   @ApiProperty({
     description: '인스턴스 이름',
@@ -79,20 +74,6 @@ export class InstanceInformations {
     type: [String],
   })
   securityGroup: string[];
-
-  @ApiProperty({
-    description: '인스턴스의 스토리지 크기',
-    required: true,
-    type: String,
-  })
-  storageVolume: string;
-
-  @ApiProperty({
-    description: '인스턴스의 스토리지 유형',
-    required: true,
-    enum: StorageType,
-  })
-  storageType: StorageType;
 }
 
 export class InstanceResponseDto {

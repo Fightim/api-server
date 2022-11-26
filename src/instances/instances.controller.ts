@@ -25,7 +25,6 @@ import {
   InstanceInformations,
   InstanceOption,
   InstanceResponseDto,
-  StorageType,
 } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
 import {
@@ -126,8 +125,6 @@ export class InstancesController {
           'tcp : 22 - 0.0.0.0/0',
           'tcp : 443 - 0.0.0.0/0',
         ],
-        storageType: StorageType.SSD,
-        storageVolume: '8GB',
       };
       const response: InstanceResponseDto = {
         options: instanceOption,

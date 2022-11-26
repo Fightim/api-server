@@ -3,7 +3,6 @@ import { InstanceResponseDto } from 'src/instances/dto';
 import {
   InstanceInformations,
   InstanceOption,
-  StorageType,
 } from 'src/instances/dto/instance-response.dto';
 import { InstanceModel } from 'src/instances/instances.service';
 
@@ -42,8 +41,6 @@ export const getInstanceResponseDtoFromInstance = (
       'tcp : 22 - 0.0.0.0/0',
       'tcp : 443 - 0.0.0.0/0',
     ],
-    storageType: StorageType.SSD,
-    storageVolume: '8GB',
   };
   const response: InstanceResponseDto = {
     options: instanceOption,
