@@ -35,6 +35,15 @@ export class InstancesService {
     @InjectModel(Instance.name) private instanceModel: Model<InstanceDocument>,
   ) {}
 
+  getUserKey(user: ReturnedUser) {
+    if (!user.accessKey || !user.secret) {
+      throw new NotFoundException(
+        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
+      );
+    }
+    return this.usersService.decodeKeys(user.accessKey, user.secret);
+  }
+
   async fetchInstances(
     instanceIds: string[],
   ): Promise<AWS.EC2.InstanceList[] | null> {
@@ -63,22 +72,9 @@ export class InstancesService {
 
   async getInstances(userId: string) {
     const user = await this.usersService.findOneWithId(userId);
+    if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    if (!user) {
-      throw new NotFoundException('잘못된 유저 정보입니다.');
-    }
-
-    if (!user.accessKey || !user.secret) {
-      throw new NotFoundException(
-        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
-      );
-    }
-
-    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
-      user.accessKey,
-      user.secret,
-    );
-
+    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const savedInstances: InstanceModel[] = [];
@@ -114,22 +110,9 @@ export class InstancesService {
 
   async getInstance(userId: string, instanceId: string) {
     const user = await this.usersService.findOneWithId(userId);
+    if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    if (!user) {
-      throw new NotFoundException('잘못된 유저 정보입니다.');
-    }
-
-    if (!user.accessKey || !user.secret) {
-      throw new NotFoundException(
-        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
-      );
-    }
-
-    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
-      user.accessKey,
-      user.secret,
-    );
-
+    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const savedInstance = await this.instanceModel
@@ -154,21 +137,9 @@ export class InstancesService {
     createInstanceDtos: CreateInstanceDto[],
   ): Promise<PromiseResult<AWS.EC2.Reservation, AWS.AWSError>[]> {
     const user = await this.usersService.findOneWithId(userId);
-    if (!user) {
-      throw new NotFoundException('잘못된 유저 정보입니다.');
-    }
+    if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    if (!user.accessKey || !user.secret) {
-      throw new NotFoundException(
-        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
-      );
-    }
-
-    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
-      user.accessKey,
-      user.secret,
-    );
-
+    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
