@@ -118,7 +118,7 @@ export class InstancesController {
   async delete(
     @Request() req: AuthorizedRequest,
     @Param('instanceId') instanceId: string,
-  ) {
+  ): Promise<boolean> {
     const userId = getUserId(req);
     return await this.instancesService.delete(userId, instanceId);
   }
