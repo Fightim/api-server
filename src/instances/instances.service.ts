@@ -17,11 +17,16 @@ import { Model, Schema } from 'mongoose';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { InstanceTier } from 'src/instances/dto/instance-response.dto';
 import { getCreateInstanceInfo } from 'src/instances/utils/getCaseInfo';
+import {
+  defaultGetInstanceOptions,
+  getInstanceOptions,
+} from 'src/instances/utils/getInstanceOptions';
 export type InstanceModel = Instance &
   Document &
   Required<{
     _id: Schema.Types.ObjectId;
   }>;
+
 @Injectable()
 export class InstancesService {
   constructor(
@@ -85,7 +90,10 @@ export class InstancesService {
     return instances;
   }
 
-  async getInstances(userId: string) {
+  async getInstances(
+    userId: string,
+    options: getInstanceOptions = defaultGetInstanceOptions,
+  ) {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
@@ -94,12 +102,16 @@ export class InstancesService {
 
     const savedInstances: InstanceModel[] = [];
 
-    savedInstances.push(
-      ...(await this.getInstanceIds(user, 'frontendInstances')),
-    );
-    savedInstances.push(
-      ...(await this.getInstanceIds(user, 'backendInstances')),
-    );
+    if (options.frontend) {
+      savedInstances.push(
+        ...(await this.getInstanceIds(user, 'frontendInstances')),
+      );
+    }
+    if (options.backend) {
+      savedInstances.push(
+        ...(await this.getInstanceIds(user, 'backendInstances')),
+      );
+    }
 
     const instanceIds = savedInstances.map((instance: InstanceModel) => {
       return instance.instanceId;
