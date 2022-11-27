@@ -64,18 +64,6 @@ export class Instance {
 
   @Prop({
     required: true,
-    type: String,
-  })
-  storageVolume: string;
-
-  @Prop({
-    required: true,
-    type: String,
-  })
-  storageType: string;
-
-  @Prop({
-    required: true,
     type: Date,
     default: Date.now,
   })

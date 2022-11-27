@@ -5,6 +5,8 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  NotFoundException,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -19,12 +21,7 @@ import {
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
 import { CreateInstanceDto } from 'src/instances/dto';
-import {
-  InstanceInformations,
-  InstanceOption,
-  InstanceResponseDto,
-  StorageType,
-} from 'src/instances/dto/instance-response.dto';
+import { InstanceResponseDto } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
 import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
 import { getUserId } from 'src/users/utils';
@@ -56,8 +53,23 @@ export class InstancesController {
 
   @Get(':instanceId')
   @GetInstanceDocs()
-  async getInstance() {
-    return 'GET /instances/:instanceId';
+  async getInstance(
+    @Request() req: AuthorizedRequest,
+    @Param('instanceId') instanceId: string,
+  ) {
+    const userId = getUserId(req);
+
+    const instance = await this.instancesService.getInstance(
+      userId,
+      instanceId,
+    );
+
+    if (!instance) {
+      throw new NotFoundException('인스턴스 정보를 찾을 수 없습니다.');
+    }
+
+    const { savedInstance, fetchedInstance } = instance;
+    return new InstanceResponseDto(savedInstance, fetchedInstance);
   }
 
   @Post()
@@ -90,29 +102,10 @@ export class InstancesController {
         );
       }
 
-      const instanceOption: InstanceOption = {
-        name: createInstanceDto.name,
-      };
-
-      const instanceInformations: InstanceInformations = {
-        id: instanceInfo.Instances[0].InstanceId,
-        type: createInstanceDto.type,
-        os: createInstanceDto.os,
-        tier: createInstanceDto.tier,
-        publicIp: instanceInfo.Instances[0].PublicIpAddress || null,
-        privateIp: instanceInfo.Instances[0].PrivateIpAddress || null,
-        securityGroup: [
-          'tcp : 80 - 0.0.0.0/0',
-          'tcp : 22 - 0.0.0.0/0',
-          'tcp : 443 - 0.0.0.0/0',
-        ],
-        storageType: StorageType.SSD,
-        storageVolume: '8GB',
-      };
-      const response: InstanceResponseDto = {
-        options: instanceOption,
-        informations: instanceInformations,
-      };
+      const response = new InstanceResponseDto(
+        createInstanceDto,
+        instanceInfo.Instances[0],
+      );
 
       responses.push(response);
     }

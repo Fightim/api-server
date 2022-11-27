@@ -19,10 +19,7 @@ import {
 } from 'src/instances/schemas/instance.schema';
 import { Model, Schema } from 'mongoose';
 import { PromiseResult } from 'aws-sdk/lib/request';
-import {
-  InstanceTier,
-  StorageType,
-} from 'src/instances/dto/instance-response.dto';
+import { InstanceTier } from 'src/instances/dto/instance-response.dto';
 export type InstanceModel = Instance &
   Document &
   Required<{
@@ -35,9 +32,22 @@ export class InstancesService {
     @InjectModel(Instance.name) private instanceModel: Model<InstanceDocument>,
   ) {}
 
+  getUserKey(user: ReturnedUser) {
+    if (!user.accessKey || !user.secret) {
+      throw new NotFoundException(
+        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
+      );
+    }
+    return this.usersService.decodeKeys(user.accessKey, user.secret);
+  }
+
   async fetchInstances(
     instanceIds: string[],
   ): Promise<AWS.EC2.InstanceList[] | null> {
+    if (instanceIds.length == 0) {
+      return [];
+    }
+
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
     const params: AWS.EC2.DescribeInstancesRequest = {
       InstanceIds: instanceIds,
@@ -63,22 +73,9 @@ export class InstancesService {
 
   async getInstances(userId: string) {
     const user = await this.usersService.findOneWithId(userId);
+    if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    if (!user) {
-      throw new NotFoundException('잘못된 유저 정보입니다.');
-    }
-
-    if (!user.accessKey || !user.secret) {
-      throw new NotFoundException(
-        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
-      );
-    }
-
-    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
-      user.accessKey,
-      user.secret,
-    );
-
+    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const savedInstances: InstanceModel[] = [];
@@ -112,26 +109,38 @@ export class InstancesService {
     // 1124 TODO DB에 정보 refresh 하기
   }
 
+  async getInstance(userId: string, instanceId: string) {
+    const user = await this.usersService.findOneWithId(userId);
+    if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
+
+    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
+    updateAWSCredential(decodedAccessKey, decodedSecret);
+
+    const savedInstance = await this.instanceModel
+      .findOne({ instanceId: instanceId })
+      .exec();
+    if (!savedInstance) {
+      throw new NotFoundException('해당 인스턴스를 찾을 수 없습니다.');
+    }
+
+    const fetchedInstances = await this.fetchInstances([
+      savedInstance.instanceId,
+    ]);
+    if (!fetchedInstances) {
+      return null;
+    }
+    const fetchedInstance = fetchedInstances[0][0];
+    return { savedInstance, fetchedInstance };
+  }
+
   async create(
     userId: string,
     createInstanceDtos: CreateInstanceDto[],
   ): Promise<PromiseResult<AWS.EC2.Reservation, AWS.AWSError>[]> {
     const user = await this.usersService.findOneWithId(userId);
-    if (!user) {
-      throw new NotFoundException('잘못된 유저 정보입니다.');
-    }
+    if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    if (!user.accessKey || !user.secret) {
-      throw new NotFoundException(
-        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
-      );
-    }
-
-    const { decodedAccessKey, decodedSecret } = this.usersService.decodeKeys(
-      user.accessKey,
-      user.secret,
-    );
-
+    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
@@ -189,13 +198,8 @@ export class InstancesService {
         ],
       };
 
-      const instanceName = await ec2.createTags(tagParams).promise();
-
-      console.log(instanceName);
-      console.log(instanceInfo);
-      console.log(createInstanceDto);
+      await ec2.createTags(tagParams).promise();
       instanceInfos.push(instanceInfo);
-
       this.saveInstance(user, createInstanceDto, instanceInfo.Instances[0]);
     }
 
@@ -216,8 +220,6 @@ export class InstancesService {
       type: createInstanceDto.type,
       os: createInstanceDto.os,
       tier: createInstanceDto.tier,
-      storageType: StorageType.SSD,
-      storageVolume: '8GB',
       etc: instanceInfo,
     });
 

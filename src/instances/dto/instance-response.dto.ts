@@ -1,4 +1,7 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateInstanceDto } from 'src/instances/dto/create-instance.dto';
+import { InstanceModel } from 'src/instances/instances.service';
 
 export enum InstanceType {
   T2MICRO = 't2.micro',
@@ -12,11 +15,6 @@ export enum InstanceOS {
 export enum InstanceTier {
   WEBSERVER = 'WEBSERVER',
   WAS = 'WAS',
-}
-
-export enum StorageType {
-  SSD = 'SSD',
-  HDD = 'HDD',
 }
 
 export class InstanceOption {
@@ -79,20 +77,6 @@ export class InstanceInformations {
     type: [String],
   })
   securityGroup: string[];
-
-  @ApiProperty({
-    description: '인스턴스의 스토리지 크기',
-    required: true,
-    type: String,
-  })
-  storageVolume: string;
-
-  @ApiProperty({
-    description: '인스턴스의 스토리지 유형',
-    required: true,
-    enum: StorageType,
-  })
-  storageType: StorageType;
 }
 
 export class InstanceResponseDto {
@@ -109,4 +93,39 @@ export class InstanceResponseDto {
     type: InstanceInformations,
   })
   informations: InstanceInformations;
+
+  constructor(
+    savedInstance: InstanceModel | CreateInstanceDto,
+    fetchedInstance: AWS.EC2.Instance,
+  ) {
+    const instanceOption: InstanceOption = {
+      name: savedInstance.name,
+    };
+
+    if (!fetchedInstance.InstanceId) {
+      throw new InternalServerErrorException(
+        'InstanceResponseDto를 작성할 때 instanceId를 찾을 수 없습니다.',
+      );
+    }
+
+    const instanceInformations: InstanceInformations = {
+      id: fetchedInstance.InstanceId,
+      type: savedInstance.type,
+      os: savedInstance.os,
+      tier: savedInstance.tier,
+      publicIp: fetchedInstance.PublicIpAddress || null,
+      privateIp: fetchedInstance.PrivateIpAddress || null,
+      securityGroup: [
+        'tcp : 80 - 0.0.0.0/0',
+        'tcp : 22 - 0.0.0.0/0',
+        'tcp : 443 - 0.0.0.0/0',
+      ],
+    };
+    const response: InstanceResponseDto = {
+      options: instanceOption,
+      informations: instanceInformations,
+    };
+
+    return response;
+  }
 }

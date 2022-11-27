@@ -1,10 +1,6 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { InstanceResponseDto } from 'src/instances/dto';
-import {
-  InstanceInformations,
-  InstanceOption,
-  StorageType,
-} from 'src/instances/dto/instance-response.dto';
 import { InstanceModel } from 'src/instances/instances.service';
 
 export const getNameFromTag = (
@@ -28,34 +24,20 @@ export const getInstanceResponseDtoFromInstances = (
 ): InstanceResponseDto[] => {
   const instanceResponseDtos: InstanceResponseDto[] = [];
 
+  if (savedInstances.length != fetchedInstances.length) {
+    throw new InternalServerErrorException(
+      'DB에 저장된 instance 정보와 AWS 정보가 동기화되지 않았습니다. ',
+    );
+  }
+
   for (let i = 0; i < savedInstances.length; i++) {
     const savedInstance = savedInstances[i];
     const fetchedInstance = fetchedInstances[i][0];
 
-    const instanceOption: InstanceOption = {
-      name: savedInstance.name,
-    };
-
-    const instanceInformations: InstanceInformations = {
-      id: savedInstance.instanceId,
-      type: savedInstance.type,
-      os: savedInstance.os,
-      tier: savedInstance.tier,
-      publicIp: fetchedInstance.PublicIpAddress || null,
-      privateIp: fetchedInstance.PrivateIpAddress || null,
-      securityGroup: [
-        'tcp : 80 - 0.0.0.0/0',
-        'tcp : 22 - 0.0.0.0/0',
-        'tcp : 443 - 0.0.0.0/0',
-      ],
-      storageType: StorageType.SSD,
-      storageVolume: '8GB',
-    };
-    const response: InstanceResponseDto = {
-      options: instanceOption,
-      informations: instanceInformations,
-    };
-
+    const response: InstanceResponseDto = new InstanceResponseDto(
+      savedInstance,
+      fetchedInstance,
+    );
     instanceResponseDtos.push(response);
   }
 
