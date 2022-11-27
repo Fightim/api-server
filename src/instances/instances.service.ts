@@ -38,6 +38,23 @@ export class InstancesService {
     return this.usersService.decodeKeys(user.accessKey, user.secret);
   }
 
+  async getInstanceIds(user: ReturnedUser, prop: string) {
+    const instanceList: InstanceModel[] = [];
+    if (prop != 'backendInstances' && prop != 'frontendInstances') {
+      throw new InternalServerErrorException('해당 속성을 가져올 수 없습니다.');
+    }
+
+    for (const id of user[prop]) {
+      const instance = await this.instanceModel.findOne({ _id: id }).exec();
+      if (!instance) {
+        throw new InternalServerErrorException('Error가 발생했습니다.');
+      }
+      instanceList.push(instance);
+    }
+
+    return instanceList;
+  }
+
   async fetchInstances(
     instanceIds: string[],
   ): Promise<AWS.EC2.InstanceList[] | null> {
@@ -77,21 +94,12 @@ export class InstancesService {
 
     const savedInstances: InstanceModel[] = [];
 
-    for (const id of user.frontendInstances) {
-      const instance = await this.instanceModel.findOne({ _id: id }).exec();
-      if (!instance) {
-        throw new InternalServerErrorException('Error가 발생했습니다.');
-      }
-      savedInstances.push(instance);
-    }
-
-    for (const id of user.backendInstances) {
-      const instance = await this.instanceModel.findOne({ _id: id }).exec();
-      if (!instance) {
-        throw new InternalServerErrorException('Error가 발생했습니다.');
-      }
-      savedInstances.push(instance);
-    }
+    savedInstances.push(
+      ...(await this.getInstanceIds(user, 'frontendInstances')),
+    );
+    savedInstances.push(
+      ...(await this.getInstanceIds(user, 'backendInstances')),
+    );
 
     const instanceIds = savedInstances.map((instance: InstanceModel) => {
       return instance.instanceId;
