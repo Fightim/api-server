@@ -10,9 +10,7 @@ The Cloud-GUI API description
 
 export const swaggerConfig = new DocumentBuilder()
   .addServer('http://localhost:3000')
-  .addServer(
-    'http://causeapiserver-env.eba-pegczwgz.ap-northeast-2.elasticbeanstalk.com/',
-  )
+  .addServer(`https://dev.cloud-gui.com`)
   .setTitle('Cloud-GUI')
   .setDescription(description)
   .setVersion(appVersion)
