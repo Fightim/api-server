@@ -1,3 +1,4 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { InstanceResponseDto } from 'src/instances/dto';
 import { InstanceModel } from 'src/instances/instances.service';
@@ -22,6 +23,12 @@ export const getInstanceResponseDtoFromInstances = (
   fetchedInstances: AWS.EC2.InstanceList[],
 ): InstanceResponseDto[] => {
   const instanceResponseDtos: InstanceResponseDto[] = [];
+
+  if (savedInstances.length != fetchedInstances.length) {
+    throw new InternalServerErrorException(
+      'DB에 저장된 instance 정보와 AWS 정보가 동기화되지 않았습니다. ',
+    );
+  }
 
   for (let i = 0; i < savedInstances.length; i++) {
     const savedInstance = savedInstances[i];

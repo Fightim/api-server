@@ -44,6 +44,10 @@ export class InstancesService {
   async fetchInstances(
     instanceIds: string[],
   ): Promise<AWS.EC2.InstanceList[] | null> {
+    if (instanceIds.length == 0) {
+      return [];
+    }
+
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
     const params: AWS.EC2.DescribeInstancesRequest = {
       InstanceIds: instanceIds,
