@@ -21,11 +21,7 @@ import {
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
 import { CreateInstanceDto } from 'src/instances/dto';
-import {
-  InstanceInformations,
-  InstanceOption,
-  InstanceResponseDto,
-} from 'src/instances/dto/instance-response.dto';
+import { InstanceResponseDto } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
 import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
 import { getUserId } from 'src/users/utils';
@@ -106,27 +102,10 @@ export class InstancesController {
         );
       }
 
-      const instanceOption: InstanceOption = {
-        name: createInstanceDto.name,
-      };
-
-      const instanceInformations: InstanceInformations = {
-        id: instanceInfo.Instances[0].InstanceId,
-        type: createInstanceDto.type,
-        os: createInstanceDto.os,
-        tier: createInstanceDto.tier,
-        publicIp: instanceInfo.Instances[0].PublicIpAddress || null,
-        privateIp: instanceInfo.Instances[0].PrivateIpAddress || null,
-        securityGroup: [
-          'tcp : 80 - 0.0.0.0/0',
-          'tcp : 22 - 0.0.0.0/0',
-          'tcp : 443 - 0.0.0.0/0',
-        ],
-      };
-      const response: InstanceResponseDto = {
-        options: instanceOption,
-        informations: instanceInformations,
-      };
+      const response = new InstanceResponseDto(
+        createInstanceDto,
+        instanceInfo.Instances[0],
+      );
 
       responses.push(response);
     }

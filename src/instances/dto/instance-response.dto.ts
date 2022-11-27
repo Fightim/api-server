@@ -1,4 +1,6 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateInstanceDto } from 'src/instances/dto/create-instance.dto';
 import { InstanceModel } from 'src/instances/instances.service';
 
 export enum InstanceType {
@@ -92,13 +94,22 @@ export class InstanceResponseDto {
   })
   informations: InstanceInformations;
 
-  constructor(savedInstance: InstanceModel, fetchedInstance: AWS.EC2.Instance) {
+  constructor(
+    savedInstance: InstanceModel | CreateInstanceDto,
+    fetchedInstance: AWS.EC2.Instance,
+  ) {
     const instanceOption: InstanceOption = {
       name: savedInstance.name,
     };
 
+    if (!fetchedInstance.InstanceId) {
+      throw new InternalServerErrorException(
+        'InstanceResponseDto를 작성할 때 instanceId를 찾을 수 없습니다.',
+      );
+    }
+
     const instanceInformations: InstanceInformations = {
-      id: savedInstance.instanceId,
+      id: fetchedInstance.InstanceId,
       type: savedInstance.type,
       os: savedInstance.os,
       tier: savedInstance.tier,
