@@ -5,10 +5,6 @@ import {
 } from '@nestjs/common';
 import { CreateInstanceDto } from 'src/instances/dto';
 import * as AWS from 'aws-sdk';
-import {
-  FRONTEND_USER_DATA_SCRIPT,
-  UBUNTU20_IMAGE_ID,
-} from 'src/constants/instance';
 import { updateAWSCredential } from 'src/aws/common';
 import { createSecurityGroup } from 'src/aws/ec2';
 import { ReturnedUser, UsersService } from 'src/users/users.service';
@@ -20,6 +16,7 @@ import {
 import { Model, Schema } from 'mongoose';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { InstanceTier } from 'src/instances/dto/instance-response.dto';
+import { getCreateInstanceInfo } from 'src/instances/utils/getCaseInfo';
 export type InstanceModel = Instance &
   Document &
   Required<{
@@ -154,13 +151,15 @@ export class InstancesService {
       [];
 
     for (const createInstanceDto of createInstanceDtos) {
+      const info = getCreateInstanceInfo(createInstanceDto);
+
       const instanceParams: AWS.EC2.RunInstancesRequest = {
-        ImageId: UBUNTU20_IMAGE_ID,
+        ImageId: info.imageId,
         InstanceType: 't2.micro',
         KeyName: 'cause-api-server-dev',
         MinCount: 1,
         MaxCount: 1,
-        UserData: Buffer.from(FRONTEND_USER_DATA_SCRIPT).toString('base64'),
+        UserData: Buffer.from(info.userData).toString('base64'),
         SecurityGroupIds: [securityGroupId],
       };
 

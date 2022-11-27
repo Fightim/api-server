@@ -1,24 +1,19 @@
-export const UBUNTU20_IMAGE_ID = 'ami-07d16c043aa8e5153';
+export const CENTOS_IMAGE_ID = 'ami-03bb74d9c8c575ec0';
+export const UBUNTU20_IMAGE_ID = 'ami-0a74c05e1e3b13202';
 export const FRONTEND_DOCKER_IMAGE_NAME = `deokam/react-nginx:1.1`;
-export const FRONTEND_USER_DATA_SCRIPT = `#!/bin/bash
-sudo apt-get update && upgrade
 
-sudo -y apt-get install \
-    ca-certificates \
-    curl \
-    gnupg \
-    lsb-release
-
-sudo mkdir -p /etc/apt/rings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/rings/docker.gpg 
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/rings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt update
-sudo apt -y install docker-ce docker-ce-cli containerd.io
-sudo systemctl enable docker.service
-
+export const BACKEND_UBUNTU_USER_DATA_SCRIPT = `#!/bin/bash
 sudo docker pull deokam/result-page:1.0
-sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0
- `;
+sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
+
+export const BACKEND_CENTOS_USER_DATA_SCRIPT = `#!/bin/bash
+ sudo docker pull deokam/result-page:1.0
+ sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
+
+export const FRONTEND_UBUNTU_USER_DATA_SCRIPT = `#!/bin/bash
+sudo docker pull deokam/result-page:1.0
+sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
+
+export const FRONTEND_CENTOS_USER_DATA_SCRIPT = `#!/bin/bash
+ sudo docker pull deokam/result-page:1.0
+ sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
