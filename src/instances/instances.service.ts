@@ -231,4 +231,58 @@ export class InstancesService {
 
     user.save();
   }
+
+  async delete(userId: string, instanceId: string) {
+    const instance = await this.instanceModel
+      .findOne({ instanceId: instanceId })
+      .exec();
+    if (!instance) {
+      throw new NotFoundException('인스턴스를 찾을 수 없습니다.');
+    }
+
+    const user = await this.usersService.findOneWithId(userId);
+    if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
+
+    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
+    updateAWSCredential(decodedAccessKey, decodedSecret);
+
+    // 권한 검사. or user 정보 안에 해당 instanceId가 있는지 확인하기
+
+    const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
+    const params: AWS.EC2.TerminateInstancesRequest = {
+      InstanceIds: [instanceId],
+    };
+
+    const info = await ec2.terminateInstances(params).promise();
+    if (info.$response.error) {
+      throw new InternalServerErrorException(
+        '인스턴스를 종료하는데 에러가 발생했습니다.',
+      );
+    }
+
+    const deleteResult = await this.instanceModel
+      .deleteOne({ instanceId: instanceId })
+      .exec();
+
+    if (!deleteResult.acknowledged) {
+      throw new InternalServerErrorException(
+        '인스턴스를 DB에서 제거하는데 에러가 발생했습니다.',
+      );
+    }
+
+    if (instance.tier == InstanceTier.WEBSERVER) {
+      user.frontendInstances.splice(
+        user.frontendInstances.indexOf(instance._id),
+        1,
+      );
+    } else if (instance.tier == InstanceTier.WAS) {
+      user.backendInstances.splice(
+        user.backendInstances.indexOf(instance._id),
+        1,
+      );
+    }
+
+    user.save();
+    return true;
+  }
 }

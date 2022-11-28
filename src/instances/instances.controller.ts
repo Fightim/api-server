@@ -115,8 +115,12 @@ export class InstancesController {
 
   @Delete(':instanceId')
   @DeleteInstanceDocs()
-  async delete() {
-    return 'DELETE /instances/:instanceId';
+  async delete(
+    @Request() req: AuthorizedRequest,
+    @Param('instanceId') instanceId: string,
+  ) {
+    const userId = getUserId(req);
+    return await this.instancesService.delete(userId, instanceId);
   }
 
   @Get('backend')

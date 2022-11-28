@@ -61,7 +61,6 @@ export function DeleteInstanceDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '인스턴스 삭제하기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiParam({
