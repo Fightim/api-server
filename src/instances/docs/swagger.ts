@@ -78,7 +78,6 @@ export function GetInstancesBackendDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '백엔드 인스턴스 정보 가져오기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiOkResponse({

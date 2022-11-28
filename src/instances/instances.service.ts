@@ -5,10 +5,6 @@ import {
 } from '@nestjs/common';
 import { CreateInstanceDto } from 'src/instances/dto';
 import * as AWS from 'aws-sdk';
-import {
-  FRONTEND_USER_DATA_SCRIPT,
-  UBUNTU20_IMAGE_ID,
-} from 'src/constants/instance';
 import { updateAWSCredential } from 'src/aws/common';
 import { createSecurityGroup } from 'src/aws/ec2';
 import { ReturnedUser, UsersService } from 'src/users/users.service';
@@ -20,11 +16,17 @@ import {
 import { Model, Schema } from 'mongoose';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { InstanceTier } from 'src/instances/dto/instance-response.dto';
+import { getCreateInstanceInfo } from 'src/instances/utils/getCaseInfo';
+import {
+  defaultGetInstanceOptions,
+  getInstanceOptions,
+} from 'src/instances/utils/getInstanceOptions';
 export type InstanceModel = Instance &
   Document &
   Required<{
     _id: Schema.Types.ObjectId;
   }>;
+
 @Injectable()
 export class InstancesService {
   constructor(
@@ -39,6 +41,23 @@ export class InstancesService {
       );
     }
     return this.usersService.decodeKeys(user.accessKey, user.secret);
+  }
+
+  async getInstanceIds(user: ReturnedUser, prop: string) {
+    const instanceList: InstanceModel[] = [];
+    if (prop != 'backendInstances' && prop != 'frontendInstances') {
+      throw new InternalServerErrorException('해당 속성을 가져올 수 없습니다.');
+    }
+
+    for (const id of user[prop]) {
+      const instance = await this.instanceModel.findOne({ _id: id }).exec();
+      if (!instance) {
+        throw new InternalServerErrorException('Error가 발생했습니다.');
+      }
+      instanceList.push(instance);
+    }
+
+    return instanceList;
   }
 
   async fetchInstances(
@@ -71,7 +90,10 @@ export class InstancesService {
     return instances;
   }
 
-  async getInstances(userId: string) {
+  async getInstances(
+    userId: string,
+    options: getInstanceOptions = defaultGetInstanceOptions,
+  ) {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
@@ -80,20 +102,15 @@ export class InstancesService {
 
     const savedInstances: InstanceModel[] = [];
 
-    for (const id of user.frontendInstances) {
-      const instance = await this.instanceModel.findOne({ _id: id }).exec();
-      if (!instance) {
-        throw new InternalServerErrorException('Error가 발생했습니다.');
-      }
-      savedInstances.push(instance);
+    if (options.frontend) {
+      savedInstances.push(
+        ...(await this.getInstanceIds(user, 'frontendInstances')),
+      );
     }
-
-    for (const id of user.backendInstances) {
-      const instance = await this.instanceModel.findOne({ _id: id }).exec();
-      if (!instance) {
-        throw new InternalServerErrorException('Error가 발생했습니다.');
-      }
-      savedInstances.push(instance);
+    if (options.backend) {
+      savedInstances.push(
+        ...(await this.getInstanceIds(user, 'backendInstances')),
+      );
     }
 
     const instanceIds = savedInstances.map((instance: InstanceModel) => {
@@ -154,13 +171,15 @@ export class InstancesService {
       [];
 
     for (const createInstanceDto of createInstanceDtos) {
+      const info = getCreateInstanceInfo(createInstanceDto);
+
       const instanceParams: AWS.EC2.RunInstancesRequest = {
-        ImageId: UBUNTU20_IMAGE_ID,
+        ImageId: info.imageId,
         InstanceType: 't2.micro',
         KeyName: 'cause-api-server-dev',
         MinCount: 1,
         MaxCount: 1,
-        UserData: Buffer.from(FRONTEND_USER_DATA_SCRIPT).toString('base64'),
+        UserData: Buffer.from(info.userData).toString('base64'),
         SecurityGroupIds: [securityGroupId],
       };
 

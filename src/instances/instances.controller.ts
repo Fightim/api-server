@@ -21,6 +21,7 @@ import {
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
 import { CreateInstanceDto } from 'src/instances/dto';
+import { InstanceConnectionConfigResponseDto } from 'src/instances/dto/instance-connection-config-response.dto';
 import { InstanceResponseDto } from 'src/instances/dto/instance-response.dto';
 import { InstancesService } from 'src/instances/instances.service';
 import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
@@ -33,6 +34,7 @@ import { AuthorizedRequest } from 'src/utils/types';
 @Controller('instances')
 export class InstancesController {
   constructor(private readonly instancesService: InstancesService) {}
+
   @Get()
   @GetInstancesDocs()
   async getInstances(@Request() req: AuthorizedRequest) {
@@ -49,6 +51,29 @@ export class InstancesController {
       savedInstances,
       fetchedInstances,
     );
+  }
+
+  @Get('backend')
+  @GetInstancesBackendDocs()
+  async getBackendInstance(
+    @Request() req: AuthorizedRequest,
+  ): Promise<InstanceConnectionConfigResponseDto> {
+    const userId = getUserId(req);
+    const res = await this.instancesService.getInstances(userId, {
+      backend: true,
+    });
+
+    if (!res || res.fetchedInstances.length == 0) {
+      return { publicIp: null };
+    }
+
+    const { savedInstances, fetchedInstances } = res;
+    const instanceResponseDtos = await getInstanceResponseDtoFromInstances(
+      savedInstances,
+      fetchedInstances,
+    );
+
+    return { publicIp: instanceResponseDtos[0].informations.publicIp };
   }
 
   @Get(':instanceId')
@@ -118,14 +143,8 @@ export class InstancesController {
   async delete(
     @Request() req: AuthorizedRequest,
     @Param('instanceId') instanceId: string,
-  ) {
+  ): Promise<boolean> {
     const userId = getUserId(req);
     return await this.instancesService.delete(userId, instanceId);
-  }
-
-  @Get('backend')
-  @GetInstancesBackendDocs()
-  async getBackendInstance() {
-    return 'GET /instances/backend';
   }
 }
