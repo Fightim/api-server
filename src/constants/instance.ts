@@ -4,16 +4,16 @@ export const FRONTEND_DOCKER_IMAGE_NAME = `deokam/react-nginx:1.1`;
 
 export const BACKEND_UBUNTU_USER_DATA_SCRIPT = `#!/bin/bash
 sudo docker pull deokam/result-page:1.0
-sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
+sudo docker run -d -p 80:80 --name react-test deokam/result-page:latest`;
 
 export const BACKEND_CENTOS_USER_DATA_SCRIPT = `#!/bin/bash
  sudo docker pull deokam/result-page:1.0
- sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
+ sudo docker run -d -p 80:80 --name react-test deokam/result-page:latest`;
 
 export const FRONTEND_UBUNTU_USER_DATA_SCRIPT = `#!/bin/bash
 sudo docker pull deokam/result-page:1.0
-sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
+sudo docker run -d -p 80:80 --name react-test deokam/result-page:latest`;
 
 export const FRONTEND_CENTOS_USER_DATA_SCRIPT = `#!/bin/bash
  sudo docker pull deokam/result-page:1.0
- sudo docker run -d -p 80:80 --name react-test deokam/result-page:1.0`;
+ sudo docker run -d -p 80:80 --name react-test deokam/result-page:latest`;
