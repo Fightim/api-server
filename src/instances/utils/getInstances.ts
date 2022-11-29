@@ -32,11 +32,18 @@ export const getInstanceResponseDtoFromInstances = (
 
   for (let i = 0; i < savedInstances.length; i++) {
     const savedInstance = savedInstances[i];
-    const fetchedInstance = fetchedInstances[i][0];
+    const instanceId = savedInstances[i].instanceId;
+    const fetchedInstance = fetchedInstances.find(
+      (instance) => instance[0].InstanceId == instanceId,
+    );
+
+    if (!fetchedInstance) {
+      throw new InternalServerErrorException('인스턴스를 찾을 수 없습니다.');
+    }
 
     const response: InstanceResponseDto = new InstanceResponseDto(
       savedInstance,
-      fetchedInstance,
+      fetchedInstance[0],
     );
     instanceResponseDtos.push(response);
   }
