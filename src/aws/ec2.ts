@@ -49,8 +49,6 @@ export const createSecurityGroup = async (
     ],
   };
 
-  const data = await ec2.authorizeSecurityGroupIngress(paramsIngress).promise();
-  console.log('Ingress Successfully Set', data);
-
+  await ec2.authorizeSecurityGroupIngress(paramsIngress).promise();
   return securityGroupId;
 };
