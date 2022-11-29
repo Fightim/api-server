@@ -1,5 +1,6 @@
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import {
   CreateRdsDocs,
   DeleteRdsDocs,
@@ -10,6 +11,7 @@ import {
 import { RdsService } from 'src/rds/rds.service';
 
 @ApiTags('RDS')
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('rds')
 export class RdsController {
