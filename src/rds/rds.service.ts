@@ -6,7 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { CreateRdsDto } from 'src/rds/dto';
 import * as AWS from 'aws-sdk';
-import { ReturnedUser, UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/users/users.service';
 import { updateAWSCredential } from 'src/aws/common';
 
 @Injectable()
@@ -16,20 +16,12 @@ export class RdsService {
     private readonly usersService: UsersService,
   ) {}
 
-  getUserKey(user: ReturnedUser) {
-    if (!user.accessKey || !user.secret) {
-      throw new NotFoundException(
-        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
-      );
-    }
-    return this.usersService.decodeKeys(user.accessKey, user.secret);
-  }
-
   async create(userId: string, createRdsDto: CreateRdsDto) {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
+    const { decodedAccessKey, decodedSecret } =
+      this.usersService.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const rds = new AWS.RDS({ apiVersion: '2014-10-31' });
