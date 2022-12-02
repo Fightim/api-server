@@ -47,7 +47,6 @@ export class RdsService {
     const rds = new AWS.RDS({ apiVersion: '2014-10-31' });
 
     const params: AWS.RDS.CreateDBInstanceMessage = {
-      DBName: 'testestest',
       AllocatedStorage: 10,
       DBInstanceIdentifier: createRdsDto.name,
       DBInstanceClass: 'db.t3.micro',
