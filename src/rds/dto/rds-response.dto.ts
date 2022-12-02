@@ -18,6 +18,20 @@ export class RdsOptions {
 
 export class RdsInformations {
   @ApiProperty({
+    description: '데이터베이스의 id',
+    required: true,
+    type: String,
+  })
+  id: string;
+
+  @ApiProperty({
+    description: '데이터베이스의 상태',
+    required: true,
+    type: String,
+  })
+  DBInstanceStatus: string;
+
+  @ApiProperty({
     description: '엔드포인트',
     required: true,
     type: String,
