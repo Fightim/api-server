@@ -30,8 +30,9 @@ export class RdsController {
 
   @Get()
   @GetRdsesDocs()
-  async getRdses() {
-    return 'GET /rdses';
+  async getRdses(@Request() req: AuthorizedRequest) {
+    const userId = getUserId(req);
+    return this.rdsService.getRdses(userId);
   }
 
   @Get('config')
