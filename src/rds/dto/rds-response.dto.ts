@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import * as AWS from 'aws-sdk';
 
 export class RdsOptions {
   @ApiProperty({
@@ -67,4 +68,21 @@ export class RdsResponseDto {
     type: RdsInformations,
   })
   informations: RdsInformations;
+
+  constructor(dbInstance: AWS.RDS.DBInstance) {
+    const options: RdsOptions = {
+      name: dbInstance.DBInstanceIdentifier,
+      masterUserName: dbInstance.MasterUsername,
+    };
+
+    const informations: RdsInformations = {
+      id: dbInstance.DBInstanceIdentifier,
+      DBInstanceStatus: dbInstance.DBInstanceStatus,
+      endPoint: dbInstance.Endpoint?.Address,
+      port: dbInstance.Endpoint?.Port,
+      storage: dbInstance.AllocatedStorage,
+    };
+
+    return { options: options, informations: informations };
+  }
 }
