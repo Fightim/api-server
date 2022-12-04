@@ -32,7 +32,6 @@ export class RdsService {
       );
     }
 
-    console.log(dbs.DBInstances);
     return dbs.DBInstances;
   }
 

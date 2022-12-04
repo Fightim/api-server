@@ -16,7 +16,7 @@ import {
   GetRdsDocs,
   GetRdsesDocs,
 } from 'src/rds/docs/swagger';
-import { CreateRdsDto } from 'src/rds/dto';
+import { CreateRdsDto, RdsResponseDto } from 'src/rds/dto';
 import { RdsService } from 'src/rds/rds.service';
 import { getUserId } from 'src/users/utils';
 import { AuthorizedRequest } from 'src/utils/types';
@@ -30,9 +30,15 @@ export class RdsController {
 
   @Get()
   @GetRdsesDocs()
-  async getRdses(@Request() req: AuthorizedRequest) {
+  async getRdses(@Request() req: AuthorizedRequest): Promise<RdsResponseDto[]> {
     const userId = getUserId(req);
-    return this.rdsService.getRdses(userId);
+    const dbs = await this.rdsService.getRdses(userId);
+    const responses: RdsResponseDto[] = [];
+    for (const db of dbs) {
+      responses.push(new RdsResponseDto(db));
+    }
+
+    return responses;
   }
 
   @Get('config')
