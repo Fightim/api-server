@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model } from 'mongoose';
@@ -103,5 +107,14 @@ export class UsersService {
       this.aesSecret,
     ).toString(CryptoJs.enc.Utf8);
     return { decodedAccessKey: decodedAccessKey, decodedSecret: decodedSecret };
+  }
+
+  getUserKey(user: ReturnedUser) {
+    if (!user.accessKey || !user.secret) {
+      throw new NotFoundException(
+        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
+      );
+    }
+    return this.decodeKeys(user.accessKey, user.secret);
   }
 }

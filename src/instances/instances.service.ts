@@ -34,15 +34,6 @@ export class InstancesService {
     @InjectModel(Instance.name) private instanceModel: Model<InstanceDocument>,
   ) {}
 
-  getUserKey(user: ReturnedUser) {
-    if (!user.accessKey || !user.secret) {
-      throw new NotFoundException(
-        '유저의 access key id, secret key가 저장되어 있지 않습니다.',
-      );
-    }
-    return this.usersService.decodeKeys(user.accessKey, user.secret);
-  }
-
   async getInstanceIds(user: ReturnedUser, prop: string) {
     const instanceList: InstanceModel[] = [];
     if (prop != 'backendInstances' && prop != 'frontendInstances') {
@@ -97,7 +88,8 @@ export class InstancesService {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
+    const { decodedAccessKey, decodedSecret } =
+      this.usersService.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const savedInstances: InstanceModel[] = [];
@@ -130,7 +122,8 @@ export class InstancesService {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
+    const { decodedAccessKey, decodedSecret } =
+      this.usersService.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const savedInstance = await this.instanceModel
@@ -157,7 +150,8 @@ export class InstancesService {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
+    const { decodedAccessKey, decodedSecret } =
+      this.usersService.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
@@ -262,7 +256,8 @@ export class InstancesService {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
-    const { decodedAccessKey, decodedSecret } = this.getUserKey(user);
+    const { decodedAccessKey, decodedSecret } =
+      this.usersService.getUserKey(user);
     updateAWSCredential(decodedAccessKey, decodedSecret);
 
     // 권한 검사. or user 정보 안에 해당 instanceId가 있는지 확인하기

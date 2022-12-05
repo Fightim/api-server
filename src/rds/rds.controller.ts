@@ -1,4 +1,13 @@
-import { Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import {
@@ -8,7 +17,10 @@ import {
   GetRdsDocs,
   GetRdsesDocs,
 } from 'src/rds/docs/swagger';
+import { CreateRdsDto, RdsResponseDto } from 'src/rds/dto';
 import { RdsService } from 'src/rds/rds.service';
+import { getUserId } from 'src/users/utils';
+import { AuthorizedRequest } from 'src/utils/types';
 
 @ApiTags('RDS')
 @UseGuards(JwtAuthGuard)
@@ -19,31 +31,52 @@ export class RdsController {
 
   @Get()
   @GetRdsesDocs()
-  async getRdses() {
-    return 'GET /rdses';
+  async getRdses(@Request() req: AuthorizedRequest): Promise<RdsResponseDto[]> {
+    const userId = getUserId(req);
+    const dbs = await this.rdsService.getRdses(userId);
+    const responses: RdsResponseDto[] = [];
+    for (const db of dbs) {
+      responses.push(new RdsResponseDto(db));
+    }
+    return responses;
   }
 
   @Get('config')
   @GetRdsConfig()
-  async getRdsConfig() {
-    return this.rdsService.getRdsConfig();
+  async getRdsConfig(@Request() req: AuthorizedRequest) {
+    const userId = getUserId(req);
+    return this.rdsService.getRdsConfig(userId);
   }
 
   @Get(':rdsId')
   @GetRdsDocs()
-  async getRds() {
-    return 'GET /rdses/:rdsId';
+  async getRds(
+    @Request() req: AuthorizedRequest,
+    @Param('rdsId') rdsId: string,
+  ) {
+    const userId = getUserId(req);
+    return new RdsResponseDto(await this.rdsService.getRds(userId, rdsId));
   }
 
   @Post()
   @CreateRdsDocs()
-  async createRds() {
-    return 'POST /rdses';
+  async createRds(
+    @Request() req: AuthorizedRequest,
+    @Body() createRdsDto: CreateRdsDto,
+  ): Promise<RdsResponseDto> {
+    const userId = getUserId(req);
+    return new RdsResponseDto(
+      await this.rdsService.create(userId, createRdsDto),
+    );
   }
 
   @Delete(':rdsId')
   @DeleteRdsDocs()
-  async deleteRds() {
-    return 'DELETE /rdses/:rdsId';
+  async deleteRds(
+    @Request() req: AuthorizedRequest,
+    @Param('rdsId') rdsId: string,
+  ): Promise<RdsResponseDto> {
+    const userId = getUserId(req);
+    return new RdsResponseDto(await this.rdsService.delete(userId, rdsId));
   }
 }

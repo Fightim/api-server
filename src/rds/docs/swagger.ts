@@ -14,7 +14,6 @@ export function GetRdsesDocs() {
   return applyDecorators(
     ApiOperation({
       summary: 'RDS 정보 전부 가져오기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiOkResponse({
@@ -27,7 +26,6 @@ export function GetRdsDocs() {
   return applyDecorators(
     ApiOperation({
       summary: '특정 RDS 정보 가져오기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiParam({
@@ -46,7 +44,6 @@ export function CreateRdsDocs() {
   return applyDecorators(
     ApiOperation({
       summary: 'RDS 생성하기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiBody({
@@ -62,7 +59,6 @@ export function DeleteRdsDocs() {
   return applyDecorators(
     ApiOperation({
       summary: 'RDS 삭제하기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiParam({
@@ -72,7 +68,7 @@ export function DeleteRdsDocs() {
       required: true,
     }),
     ApiOkResponse({
-      type: Boolean,
+      type: RdsResponseDto,
     }),
   );
 }
@@ -81,7 +77,6 @@ export function GetRdsConfig() {
   return applyDecorators(
     ApiOperation({
       summary: 'RDS 접속 정보 가져오기',
-      deprecated: true,
     }),
     JwtHeader,
     ApiOkResponse({
