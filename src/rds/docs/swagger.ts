@@ -68,7 +68,7 @@ export function DeleteRdsDocs() {
       required: true,
     }),
     ApiOkResponse({
-      type: Boolean,
+      type: RdsResponseDto,
     }),
   );
 }

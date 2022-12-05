@@ -75,7 +75,7 @@ export class RdsController {
   async deleteRds(
     @Request() req: AuthorizedRequest,
     @Param('rdsId') rdsId: string,
-  ) {
+  ): Promise<RdsResponseDto> {
     const userId = getUserId(req);
     return new RdsResponseDto(await this.rdsService.delete(userId, rdsId));
   }
