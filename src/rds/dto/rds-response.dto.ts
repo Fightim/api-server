@@ -57,6 +57,7 @@ export class RdsInformations {
     description: '스토리지',
     required: true,
     type: Number,
+    nullable: true,
   })
   storage: number | null;
 }
