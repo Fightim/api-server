@@ -58,9 +58,11 @@ export class RdsController {
   async createRds(
     @Request() req: AuthorizedRequest,
     @Body() createRdsDto: CreateRdsDto,
-  ) {
+  ): Promise<RdsResponseDto> {
     const userId = getUserId(req);
-    return this.rdsService.create(userId, createRdsDto);
+    return new RdsResponseDto(
+      await this.rdsService.create(userId, createRdsDto),
+    );
   }
 
   @Delete(':rdsId')
