@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -37,7 +38,6 @@ export class RdsController {
     for (const db of dbs) {
       responses.push(new RdsResponseDto(db));
     }
-
     return responses;
   }
 
@@ -49,8 +49,12 @@ export class RdsController {
 
   @Get(':rdsId')
   @GetRdsDocs()
-  async getRds() {
-    return 'GET /rdses/:rdsId';
+  async getRds(
+    @Request() req: AuthorizedRequest,
+    @Param('rdsId') rdsId: string,
+  ) {
+    const userId = getUserId(req);
+    return new RdsResponseDto(await this.rdsService.getRds(userId, rdsId));
   }
 
   @Post()
