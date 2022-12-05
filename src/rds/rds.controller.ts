@@ -43,8 +43,9 @@ export class RdsController {
 
   @Get('config')
   @GetRdsConfig()
-  async getRdsConfig() {
-    return this.rdsService.getRdsConfig();
+  async getRdsConfig(@Request() req: AuthorizedRequest) {
+    const userId = getUserId(req);
+    return this.rdsService.getRdsConfig(userId);
   }
 
   @Get(':rdsId')
@@ -71,7 +72,11 @@ export class RdsController {
 
   @Delete(':rdsId')
   @DeleteRdsDocs()
-  async deleteRds() {
-    return 'DELETE /rdses/:rdsId';
+  async deleteRds(
+    @Request() req: AuthorizedRequest,
+    @Param('rdsId') rdsId: string,
+  ) {
+    const userId = getUserId(req);
+    return new RdsResponseDto(await this.rdsService.delete(userId, rdsId));
   }
 }
