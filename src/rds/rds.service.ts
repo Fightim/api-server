@@ -16,7 +16,7 @@ export class RdsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getRdses(userId: string) {
+  async getRdses(userId: string): Promise<AWS.RDS.DBInstanceList> {
     const user = await this.usersService.findOneWithId(userId);
     if (!user) throw new NotFoundException('잘못된 유저 정보입니다.');
 
@@ -89,8 +89,6 @@ export class RdsService {
     }
 
     const newDBInstance = newDB.DBInstance;
-    console.log(newDBInstance);
-
     return newDBInstance;
   }
 
