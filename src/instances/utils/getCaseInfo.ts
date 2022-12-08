@@ -30,7 +30,7 @@ export function getCreateInstanceInfo(
   ) {
     return {
       imageId: NODE_CENTOS_IMAGE_ID,
-      userData: getUserScript(createInstanceDto.githubUrl),
+      userData: getUserScript(createInstanceDto.githubUrl.trim()),
     };
   } else if (
     createInstanceDto.githubUrl &&
@@ -38,7 +38,7 @@ export function getCreateInstanceInfo(
   ) {
     return {
       imageId: NODE_UBUNTU_IMAGE_ID,
-      userData: getUserScript(createInstanceDto.githubUrl),
+      userData: getUserScript(createInstanceDto.githubUrl.trim()),
     };
   } else if (
     createInstanceDto.os == InstanceOS.CENTOS &&
