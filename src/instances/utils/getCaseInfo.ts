@@ -5,6 +5,9 @@ import {
   CENTOS_IMAGE_ID,
   FRONTEND_CENTOS_USER_DATA_SCRIPT,
   FRONTEND_UBUNTU_USER_DATA_SCRIPT,
+  getUserScript,
+  NODE_CENTOS_IMAGE_ID,
+  NODE_UBUNTU_IMAGE_ID,
   UBUNTU20_IMAGE_ID,
 } from 'src/constants/instance';
 import { CreateInstanceDto } from 'src/instances/dto';
@@ -22,6 +25,22 @@ export function getCreateInstanceInfo(
   createInstanceDto: CreateInstanceDto,
 ): CreateInstanceInfo {
   if (
+    createInstanceDto.githubUrl &&
+    createInstanceDto.os == InstanceOS.CENTOS
+  ) {
+    return {
+      imageId: NODE_CENTOS_IMAGE_ID,
+      userData: getUserScript(createInstanceDto.githubUrl),
+    };
+  } else if (
+    createInstanceDto.githubUrl &&
+    createInstanceDto.os == InstanceOS.UBUNTU
+  ) {
+    return {
+      imageId: NODE_UBUNTU_IMAGE_ID,
+      userData: getUserScript(createInstanceDto.githubUrl),
+    };
+  } else if (
     createInstanceDto.os == InstanceOS.CENTOS &&
     createInstanceDto.tier == InstanceTier.WEBSERVER
   ) {

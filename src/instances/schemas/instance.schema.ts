@@ -25,7 +25,6 @@ export class Instance {
   name: string;
 
   @Prop({
-    required: true,
     type: String,
     default: '',
   })

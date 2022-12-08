@@ -107,7 +107,7 @@ export class InstanceResponseDto {
   ) {
     const instanceOption: InstanceOption = {
       name: savedInstance.name,
-      githubUrl: savedInstance.githubUrl,
+      githubUrl: savedInstance.githubUrl ? savedInstance.githubUrl : '',
     };
 
     if (!fetchedInstance.InstanceId) {

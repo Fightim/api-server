@@ -213,7 +213,11 @@ export class InstancesService {
 
       await ec2.createTags(tagParams).promise();
       instanceInfos.push(instanceInfo);
-      this.saveInstance(user, createInstanceDto, instanceInfo.Instances[0]);
+      await this.saveInstance(
+        user,
+        createInstanceDto,
+        instanceInfo.Instances[0],
+      );
     }
 
     return instanceInfos;
@@ -227,6 +231,7 @@ export class InstancesService {
     const createdInstance = await this.instanceModel.create({
       instanceId: instanceInfo.InstanceId,
       name: createInstanceDto.name,
+      githubUrl: createInstanceDto.githubUrl,
       publicIp: instanceInfo.PublicIpAddress || null,
       privateIp: instanceInfo.PrivateIpAddress,
       securityGroup: ['tcp : 80 - 0.0.0.0/0', 'tcp : 22 - 0.0.0.0/0'],
@@ -242,7 +247,7 @@ export class InstancesService {
       user.backendInstances.push(createdInstance._id);
     }
 
-    user.save();
+    await user.save();
   }
 
   async delete(userId: string, instanceId: string) {
