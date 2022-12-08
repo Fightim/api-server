@@ -26,6 +26,12 @@ export class Instance {
 
   @Prop({
     type: String,
+    default: '',
+  })
+  githubUrl: string;
+
+  @Prop({
+    type: String,
   })
   publicIp: string | null;
 

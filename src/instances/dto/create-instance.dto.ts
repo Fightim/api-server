@@ -32,4 +32,11 @@ export class CreateInstanceDto {
     required: true,
   })
   name: string;
+
+  @ApiProperty({
+    description: '연동하고 싶은 github repository 주소',
+    required: true,
+    nullable: true,
+  })
+  githubUrl: string;
 }

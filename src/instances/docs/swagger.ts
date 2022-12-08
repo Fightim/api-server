@@ -5,8 +5,11 @@ import {
   ApiOperation,
   ApiParam,
 } from '@nestjs/swagger';
-import { CreateInstanceDto, InstanceResponseDto } from 'src/instances/dto';
-import { InstanceConnectionConfigResponseDto } from 'src/instances/dto/instance-connection-config-response.dto';
+import {
+  CreateInstanceDto,
+  InstanceResponseDto,
+  InstanceConnectionConfigResponseDto,
+} from 'src/instances/dto';
 import { JwtHeader } from 'src/utils/swagger';
 
 export function GetInstancesDocs() {

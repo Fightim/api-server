@@ -20,9 +20,11 @@ import {
   GetInstancesBackendDocs,
   GetInstancesDocs,
 } from 'src/instances/docs/swagger';
-import { CreateInstanceDto } from 'src/instances/dto';
-import { InstanceConnectionConfigResponseDto } from 'src/instances/dto/instance-connection-config-response.dto';
-import { InstanceResponseDto } from 'src/instances/dto/instance-response.dto';
+import {
+  CreateInstanceDto,
+  InstanceConnectionConfigResponseDto,
+  InstanceResponseDto,
+} from 'src/instances/dto';
 import { InstancesService } from 'src/instances/instances.service';
 import { getInstanceResponseDtoFromInstances } from 'src/instances/utils/getInstances';
 import { getUserId } from 'src/users/utils';

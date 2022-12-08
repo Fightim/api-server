@@ -3,7 +3,8 @@ import { LoginUserDto } from 'src/auth/dto';
 
 export class UserLoginDtoValidationPipe implements PipeTransform {
   transform(value: LoginUserDto): LoginUserDto {
-    // 추후 로직 작성
+    value.email = value.email.trim();
+    value.password = value.password.trim();
     return value;
   }
 }
