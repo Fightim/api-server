@@ -24,6 +24,13 @@ export class InstanceOption {
     type: String,
   })
   name: string;
+
+  @ApiProperty({
+    description: '연동된 github Url',
+    required: true,
+    type: String,
+  })
+  githubUrl: string;
 }
 
 export class InstanceInformations {
@@ -100,6 +107,7 @@ export class InstanceResponseDto {
   ) {
     const instanceOption: InstanceOption = {
       name: savedInstance.name,
+      githubUrl: savedInstance.githubUrl,
     };
 
     if (!fetchedInstance.InstanceId) {
